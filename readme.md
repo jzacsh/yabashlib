@@ -1,4 +1,4 @@
-#Yet Another Bash Utility (yabash)
+#Yet Another Bash Library (yabashlib)
 
 ## Usage
 Just `source` from your own bash script, eg:
