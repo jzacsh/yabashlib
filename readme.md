@@ -1,4 +1,5 @@
 #Yet Another Bash Library (yabashlib)
+[![Build Status](https://travis-ci.org/jzacsh/yabashlib.png?branch=master)](https://travis-ci.org/jzacsh/yabashlib)
 
 ## Usage
 Just `source` from your own bash script, eg:
