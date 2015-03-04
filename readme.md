@@ -1,7 +1,6 @@
-#Yet Another Bash Library (yabashlib)
-[![Build Status](https://travis-ci.org/jzacsh/yabashlib.png?branch=master)](https://travis-ci.org/jzacsh/yabashlib)
+#Yet Another Bash Library: `yabashlib`
 
-## Usage
+## Usage [![Build Status](https://travis-ci.org/jzacsh/yabashlib.png?branch=master)](https://travis-ci.org/jzacsh/yabashlib)
 Just `source` from your own bash script, eg:
 ```bash
 #!/usr/bin/env bash
