@@ -8,11 +8,8 @@ Just `source` from your own bash script, eg:
 # MyScript that does awesome things to $1 dir
 
 source "files.sh" $@
-source "behavior.sh" $@
 source "logging.sh" $@
-
-# from logging.sh
-setLogPrefixTo 'MyScript'
+source "behavior.sh" 'MyScript'
 
 # from  behavior.sh
 trap dieSigInt SIGINT
