@@ -1,4 +1,5 @@
 #Yet Another Bash Library: `yabashlib`
+Some stuff I wrote when I was creating a needlessly complicated [dotfiles manager](https://dotfiles.github.io/) and installer, strictly in Bash. Sharing just this part of that adventure, so the next time I want moderately pleasant scripting behavior _(mostly in `logging.sh`)_, it will be here and tested.
 
 ## Usage [![Build Status](https://travis-ci.org/jzacsh/yabashlib.png?branch=master)](https://travis-ci.org/jzacsh/yabashlib)
 Just `source` from your own bash script, eg:
