@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+if [[ "${BASH_SOURCE[0]}" = "$0" ]];then
+  printf 'Error: `yabashlib` wrapper intended as a script, not a source!\n' >&2
+  exit 1
+fi
+
+for src in "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"/src/*.sh; do
+  source "$src"
+done
