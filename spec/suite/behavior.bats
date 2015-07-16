@@ -5,7 +5,6 @@ load mocks
 
 setup() {
   source "$SRCS/behavior.sh" fooBarTool
-  setLogPrefixTo fooBarTool
   MOCK_DATE="$(date)"
 }
 
