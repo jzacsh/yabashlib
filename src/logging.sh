@@ -25,6 +25,8 @@ logWarning() { logAs_ $LOG_LVL_WARNING_ $@; }
 setMaxLogLevelToError() { LOG_MODE_=$LOG_LVL_ERROR_; }
 logError() { logAs_ $LOG_LVL_ERROR_ $@; }
 
+disableLogHeaders() { LOG_HEADERS_=0; }
+enableLogHeaders() { LOG_HEADERS_=1; }
 
 # end public API #####################################
 
@@ -42,7 +44,7 @@ LOG_LVL_INFO_=2
 LOG_LVL_WARNING_=3
 LOG_LVL_ERROR_=4
 LOG_MODE_=$LOG_LVL_INFO_
-
+LOG_HEADERS_=1
 
 # $1 = LOG_LVL_*
 # .. = error message
@@ -67,9 +69,12 @@ getLogLvlFileDescriptor_() {
 # $1 = LOG_LVL_*
 # $2 = file descriptor to output to
 printLogHeader_() {
-  local loglvl fd color keyword
+  local log_lvl fd color keyword
   log_lvl=$1
   fd=$2
+
+  (( LOG_HEADERS_ )) || return 0
+
   case "$log_lvl" in
     $LOG_LVL_DEBUG_)
       color=$col_blu_
@@ -106,7 +111,6 @@ printStamp_() {
     echo -ne "[$@]\t" >&$fd
   fi
 }
-
 
 logLevelArg="${1/--log_level=/}"
 case "${logLevelArg,,}" in

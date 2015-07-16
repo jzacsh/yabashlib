@@ -107,6 +107,33 @@ teardown() {
 }
 
 
+@test 'should allow disabling log headers at all levels ' {
+  setMaxLogLevelToDebug
+
+  disableLogHeaders
+
+  run logDebug 'my debug log'
+  [ "$status" -eq 0 ]
+  [ "${#lines[@]}" -eq 1 ]
+  [ "${lines[0]}" = 'my debug log' ]
+
+  run logInfo 'my info log'
+  [ "$status" -eq 0 ]
+  [ "${#lines[@]}" -eq 1 ]
+  [ "${lines[0]}" = 'my info log' ]
+
+  run logWarning 'my warning log'
+  [ "$status" -eq 0 ]
+  [ "${#lines[@]}" -eq 1 ]
+  [ "${lines[0]}" = 'my warning log' ]
+
+  run logError 'my error log'
+  [ "$status" -eq 0 ]
+  [ "${#lines[@]}" -eq 1 ]
+  [ "${lines[0]}" = 'my error log' ]
+}
+
+
 @test 'should exclude color in non TTY output' {
   skip 'see: github.com/sstephenson/bats/issues/43'
 }
