@@ -28,5 +28,5 @@ strStripRepeats() (
   local repeat="$2"
 
   shopt -s extglob
-  echo -n "${body//+($2)/$2}"
+  echo -n "${body//+($repeat)/$repeat}"
 )
