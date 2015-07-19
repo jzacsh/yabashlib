@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-
 # $1 = file to check for siblings of
 isFileAnOnlyChild() {
   local parentDir numChildren
