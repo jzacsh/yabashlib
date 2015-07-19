@@ -2,7 +2,7 @@
 
 # $1=string to modify
 # $2=string to trim
-stringTrimRight() (
+strTrimRight() (
   local body="$1"
   local trim="$2"
 
@@ -12,7 +12,7 @@ stringTrimRight() (
 
 # $1=string to modify
 # $2=string to trim
-stringTrimLeft() (
+strTrimLeft() (
   local body="$1"
   local trim="$2"
 
@@ -22,8 +22,8 @@ stringTrimLeft() (
 
 
 # $1=string to modify
-# $2=string to reduce
-reduceRepeats() (
+# $2=string to strip
+strStripRepeats() (
   local body="$1"
   local repeat="$2"
 

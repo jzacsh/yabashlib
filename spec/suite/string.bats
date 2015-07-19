@@ -5,20 +5,20 @@ setup() {
 }
 
 @test 'should trim right-most character of a string' {
-  run stringTrimRight '/some/abs/dir///' '/' 
+  run strTrimRight '/some/abs/dir///' '/'
   echo "$status" > /tmp/jon
   [ "$status" -eq 0 ]
   [ "$output" = '/some/abs/dir' ]
 }
 
 @test 'should trim left-most character of a string' {
-  run stringTrimLeft '/////some/abs/dir///' '/' 
+  run strTrimLeft '/////some/abs/dir///' '/'
   [ "$status" -eq 0 ]
   [ "$output" = 'some/abs/dir///' ]
 }
 
 @test 'should reduce repeated characters to single occurrence' {
-  run reduceRepeats '/////some//abs/dir///' '/' 
+  run strStripRepeats '/////some//abs/dir///' '/'
   [ "$status" -eq 0 ]
   [ "$output" = '/some/abs/dir/' ]
 }
