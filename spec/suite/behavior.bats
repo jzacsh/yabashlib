@@ -50,3 +50,17 @@ teardown() {
   [[ "${lines[1]}" =~ $testMsg ]]
   [[ "${lines[2]}" =~ ^\[fooBarTool\ exiting\ 1\]$ ]]
 }
+
+@test 'should die less than Bash v4' {
+  skip 'figure out how to force/mock bash3; `shopt -s compat32` non-starter'
+  run dieWithoutBash4
+  [ "$status" -ne 0 ]
+  [ "$output" = "Bash v.4 or greater is required to run this script, found $" ]
+}
+
+@test 'should pass with Bash v4 or higher' {
+  skip 'figure out how to force/mock bash3; `shopt -s compat32` non-starter'
+  run dieWithoutBash4
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}

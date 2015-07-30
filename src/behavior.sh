@@ -39,3 +39,11 @@ die() {
 
   exit "$exitwith"
 }
+
+dieWithoutBash4() {
+  (( BASH_VERSINFO[0] >= 4 )) && return 0
+
+  local msg="Bash v.4 or greater is required to run this script, found %s\n"
+  printf "$msg" "$BASH_VERSINFO[0]"
+  exit "$BEHAVIOR_EXIT_ERROR"
+}
