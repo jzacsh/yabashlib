@@ -15,15 +15,19 @@ setLogPrefixTo() {
 
 setMaxLogLevelToDebug() { LOG_MODE_=$LOG_LVL_DEBUG_; }
 logDebug() { logAs_ $LOG_LVL_DEBUG_ $@; }
+logfDebug() { logfAs_ "$LOG_LVL_DEBUG_" "$@"; }
 
 setMaxLogLevelToInfo() { LOG_MODE_=$LOG_LVL_INFO_; }
 logInfo() { logAs_ $LOG_LVL_INFO_ $@; }
+logfInfo() { logfAs_ "$LOG_LVL_INFO_" "$@"; }
 
 setMaxLogLevelToWarning() { LOG_MODE_=$LOG_LVL_WARNING_; }
 logWarning() { logAs_ $LOG_LVL_WARNING_ $@; }
+logfWarning() { logfAs_ "$LOG_LVL_WARNING_" "$@"; }
 
 setMaxLogLevelToError() { LOG_MODE_=$LOG_LVL_ERROR_; }
 logError() { logAs_ $LOG_LVL_ERROR_ $@; }
+logfError() { logfAs_ "$LOG_LVL_ERROR_" "$@"; }
 
 disableLogHeaders() { LOG_HEADERS_=0; }
 enableLogHeaders() { LOG_HEADERS_=1; }
@@ -46,17 +50,43 @@ LOG_LVL_ERROR_=4
 LOG_MODE_=$LOG_LVL_INFO_
 LOG_HEADERS_=1
 
+# Logger wrapping `echo` builtin.
+#
 # $1 = LOG_LVL_*
 # .. = error message
+#
+# See log[f]* variant of functions that take variable arguments (the printf
+# equivalent).
 logAs_() {
-  local lvl
-  lvl=$1; shift
-  (( lvl < LOG_MODE_ )) && return  # We're ignoring log_lvl, "$1"
+  logHeader_ "$1" || return; shift
+  echo -e "$@" >&$fd
+}
 
-  fd=$(getLogLvlFileDescriptor_ lvl)
+# Logger wrapping `printf` builtin.
+#
+# $1 = LOG_LVL_*
+# .. = error message
+#
+# For the variant of functions just wrapping echo (single argument), see those
+# functions named without `log...` instead of `logf...` (eg. `logInfo` as
+# opposed to `logfInfo`).
+logfAs_() {
+  logHeader_ "$1" || return; shift
+  local fmt="$1"; shift
+  printf "$fmt" "$@" >&$fd
+}
 
-  printLogHeader_ $lvl $fd
-  echo -e $@ >&$fd
+# Returns success if logging should continue (and thus a header was logged),
+# false otherwise.
+#
+# $1=level, indicated by one of the `LOG_LVL_*_` local variables.
+logHeader_() {
+  local lvl="$1"
+  (( lvl >= LOG_MODE_ )) || return 1
+
+  fd="$(getLogLvlFileDescriptor_ lvl)"
+
+  printLogHeader_ "$lvl" "$fd"
 }
 
 
@@ -70,8 +100,8 @@ getLogLvlFileDescriptor_() {
 # $2 = file descriptor to output to
 printLogHeader_() {
   local log_lvl fd color keyword
-  log_lvl=$1
-  fd=$2
+  log_lvl="$1"
+  fd="$2"
 
   (( LOG_HEADERS_ )) || return 0
 
