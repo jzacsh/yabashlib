@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ "${BASH_SOURCE[0]}" = "$0" ]];then
-  printf 'Error: `yabashlib` wrapper intended as a script, not a source!\n' >&2
+  printf 'Error: `yabashlib` wrapper intended as a source, not an invokable script!\n' >&2
   exit 1
 fi
 
