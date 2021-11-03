@@ -10,6 +10,9 @@ isFileAnOnlyChild() {
   [ "$numChildren" -eq 2 ]
 }
 
+# $1 = file to check for siblings of
+isNonemptyFile() { [[ -s "$1" && -f "$1" ]]; }
+
 # $1 = directory to check is empty
 isDirectoryEmpty() {
   [ "$(find "$1")" = "$1" ]
