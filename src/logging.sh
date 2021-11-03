@@ -28,6 +28,9 @@ setMaxLogLevelToError() { LOG_MODE_=$LOG_LVL_ERROR_; }
 logError() { logAs_ $LOG_LVL_ERROR_ $@; }
 logfError() { logfAs_ "$LOG_LVL_ERROR_" "$@"; }
 
+# Logs to stderr per logfError and exits non-zero.
+logfFatal() { logfError "$@"; exit 2; }
+
 disableLogHeaders() { LOG_HEADERS_=0; }
 enableLogHeaders() { LOG_HEADERS_=1; }
 
