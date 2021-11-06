@@ -60,7 +60,7 @@ LOG_HEADERS_=1
 # See log[f]* variant of functions that take variable arguments (the printf
 # equivalent).
 logAs_() {
-  logHeader_ "$1" || return; shift
+  logHeader_ "$1" || return 0; shift
   echo -e "$@" >&$fd
 }
 
@@ -73,7 +73,7 @@ logAs_() {
 # functions named without `log...` instead of `logf...` (eg. `logInfo` as
 # opposed to `logfInfo`).
 logfAs_() {
-  logHeader_ "$1" || return; shift
+  logHeader_ "$1" || return 0; shift
   local fmt="$1"; shift
   printf "$fmt" "$@" >&$fd
 }
