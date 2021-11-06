@@ -36,3 +36,9 @@ getFirstChildOfHome() {
   IFS=/ read -r firstChild _ <<< "$(getRelativeFromHome "$1")"
   printf '%s' "$firstChild"
 }
+
+# TODO add tests
+is_same_content() ( diff "$1" "$2" >/dev/null 2>&1; )
+
+# TODO add tests
+is_same_file() ( [[ "$(readlink --canonicalize "$1")" = "$(readlink --canonicalize "$2")" ]]; )
