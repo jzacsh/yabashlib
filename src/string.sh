@@ -30,3 +30,16 @@ strStripRepeats() (
   shopt -s extglob
   echo -n "${body//+($repeat)/$repeat}"
 )
+
+# Whether string "$1" is either empty or practically empty (whitespace).
+function strIsEmptyish() {
+  local empty_regexp='^[[:space:]]*$'
+  [[ -z "$1" || "$1" =~ $empty_regexp ]]
+}
+
+# Whether string "$1" starts with string "$2"
+function strStartsWith() {
+  local haystack="$1" start_substr="$2"
+  local substr_regexp='^'"$start_substr"
+  [[  "$haystack" =~ $substr_regexp ]]
+}

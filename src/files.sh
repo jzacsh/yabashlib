@@ -18,10 +18,21 @@ isDirectoryEmpty() {
   [ "$(find "$1")" = "$1" ]
 }
 
+# eg:
+#  returns  true: isDirectoryParentOfFile /foo/bar /foo/bar/baz
+#  returns false: isDirectoryParentOfFile /foo/bar /foo/doop
+#
+# NOTE: will return false if either file doesn't exist.
+#
 # $1 = directory to determine if is parent
 # $2 = file to determine as child
 isDirectoryParentOfFile() {
-  [[ "$(readlink -f "$2")" =~ "^$(readlink -f "$1")" ]]
+  local supposed_ancestor supposed_descendent
+  supposed_ancestor="$(readlink -f "$1")"
+  supposed_descendent="$(readlink -f "$2")"
+  local descendent_regexp='^'"$supposed_ancestor"
+  [[ "$supposed_descendent" =~ $descendent_regexp ]] &&
+    [[ "$supposed_descendent" != $descendent_regexp ]]
 }
 
 # $1 = path to return the relative version of
