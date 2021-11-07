@@ -22,3 +22,19 @@ setup() {
   [ "$status" -eq 0 ]
   [ "$output" = '/some/abs/dir/' ]
 }
+
+@test 'strIsEmptyish detects zero-length input' {
+  skip '`strIsEmptyish` test not written'
+}
+
+@test 'strIsEmptyish detects one or more spaces' {
+  skip '`strIsEmptyish` test not written'
+}
+
+@test 'strIsEmptyish detects strange spaces like tabs' {
+  skip '`strIsEmptyish` test not written'
+}
+
+@test 'strStartsWith detects one is a non-strict subset and prefix of another' {
+  skip '`strStartsWith` test not written'
+}
