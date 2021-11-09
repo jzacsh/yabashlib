@@ -1,5 +1,0 @@
-language: c
-script: ./test.sh --tap
-notifications:
-  email:
-    on_success: never
