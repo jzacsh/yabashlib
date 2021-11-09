@@ -1,5 +1,8 @@
 #Yet Another Bash Library: `yabashlib`
-Some stuff I wrote when I was creating a needlessly complicated [dotfiles manager](https://dotfiles.github.io/) and installer, strictly in Bash. Sharing just this part of that adventure, so the next time I want moderately pleasant scripting behavior _(mostly in `logging.sh`)_, it will be here and tested.
+Some stuff I wrote when I was creating a needlessly complicated [dotfiles
+manager](https://dotfiles.github.io/) and installer, strictly in Bash. Sharing
+just this part of that adventure, so the next time I want moderately pleasant
+scripting behavior _(mostly in `logging.sh`)_, it will be here and tested.
 
 ## Usage [![Build Status][gitlab_ci_badge]][gitlab_ci_dash]
 
@@ -66,4 +69,4 @@ $EDITOR ./spec/suite/*  # test all the things
 ```
 
 [gitlab_ci_badge]: https://gitlab.com/jzacsh/yabashlib/badges/master/pipeline.svg
-[gitlab_ci_dash]: https://gitlab.com/jzacsh/yabashlib/-/pipelines
+[gitlab_ci_dash]: https://gitlab.com/jzacsh/yabashlib/-/jobs
