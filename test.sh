@@ -16,7 +16,9 @@ else
   declare -r bats_upstream_repo=https://github.com/sstephenson/bats.git
 fi
 
-# TODO turn this on once sstephenson/bats.git si vendored.
+# TODO cleanup/rm non-vendored branch of logic once the quick-hack-testing
+# ability is no longer needed by issue 509 (see is_issue_509_resolved
+# experiment).
 declare -r use_vendored_bats=1
 if (( use_vendored_bats )); then
   if (( is_issue_509_resolved )); then
