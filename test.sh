@@ -35,10 +35,13 @@ fi
     {
       [ ! -d "$batsDir" ] || exit 3
 
-      (( use_vendored_bats )) || {
+      if (( use_vendored_bats )); then
+        echo -e '\tutilizing vendored bats...' >&$safefd
+      else
+        echo -e '\tutilizing fresh upstream code from '$bats_upstream_repo'...' >&$safefd
         git clone --quiet "$bats_upstream_repo" "$src_dir" &&
           mkdir "$batsBld"
-      }
+      fi
       "$src_dir/install.sh" "$batsBld" &&
         [ -x "$batsExec" ]
     } >&$safefd
