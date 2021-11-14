@@ -5,11 +5,6 @@ load mocks
 
 setup() {
   source "$SRCS/behavior.sh" fooBarTool
-  MOCK_DATE="$(date)"
-}
-
-teardown() {
-  unset MOCK_DATE
 }
 
 
@@ -22,7 +17,7 @@ teardown() {
 
 @test 'should die with ERROR log' {
   testMsg='foobar test'
-  run die 99 "$testMsg"
+  run_with_mocks die 99 "$testMsg"
   [ "$status" -eq 99 ]
   [[ "${lines[0]}" =~ ^\[fooBarTool::ERROR\][[:space:]]*$MOCK_DATE$ ]]
   [[ "${lines[1]}" =~ $testMsg ]]
@@ -32,7 +27,7 @@ teardown() {
 
 @test 'should die on previous error' {
   [ 1 -eq 2 ] && echo  # noop
-  run dieOnFail 89
+  run_with_mocks dieOnFail 89
   [ "$status" -eq 1 ]
   [[ "${lines[0]}" =~ ^\[fooBarTool::ERROR\][[:space:]]*$MOCK_DATE$ ]]
   [[ "${lines[1]}" =~ 'Required command exited: 89' ]]
@@ -44,7 +39,7 @@ teardown() {
   testMsg='foobar test'
 
   [ 1 -eq 2 ] && echo  # noop
-  run dieOnFail 39 "$testMsg"
+  run_with_mocks dieOnFail 39 "$testMsg"
   [ "$status" -eq 1 ]
   [[ "${lines[0]}" =~ ^\[fooBarTool::ERROR\][[:space:]]*$MOCK_DATE$ ]]
   [[ "${lines[1]}" =~ $testMsg ]]

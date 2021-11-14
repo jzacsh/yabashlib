@@ -6,17 +6,10 @@ load mocks
 setup() {
   source "$SRCS/logging.sh"
   setLogPrefixTo 'logtests'
-
-  MOCK_DATE="$(date)"
 }
-
-teardown() {
-  unset MOCK_DATE
-}
-
 
 @test 'should include timestamp in ERROR level' {
-  run logError "testing123"
+  run_with_mocks logError "testing123"
   [ "$status" -eq 0 ]
   [[ "${lines[0]}" =~ ^\[logtests::ERROR\][[:space:]]*$MOCK_DATE$ ]]
   [[ "${lines[1]}" =~ testing123 ]]
@@ -60,7 +53,7 @@ teardown() {
   [ "$status" -eq 0 ]
   [[ "${lines[0]}" =~ ^\[logging::WARNING\][[:space:]]*$testMsg$ ]]
 
-  run logError "$testMsg"
+  run_with_mocks logError "$testMsg"
   [ "$status" -eq 0 ]
   [[ "${lines[0]}" =~ ^\[logging::ERROR\][[:space:]]*$MOCK_DATE$ ]]
   [[ "${lines[1]}" =~ ^$testMsg$ ]]
@@ -155,7 +148,7 @@ teardown() {
 
 
 @test 'should error-exit via logfFatal' {
-  run logfFatal 'my %s log\n' printf-fatal
+  run_with_mocks logfFatal 'my %s log\n' printf-fatal
   [ "$status" -ne 0 ]
   [ "${#lines[@]}" -eq 2 ]
   [[ "${lines[0]}" =~ ^\[logtests::ERROR\][[:space:]]*$MOCK_DATE$ ]]

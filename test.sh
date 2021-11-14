@@ -9,7 +9,7 @@ batsExec="$batsBld/bin/bats"
 
 # TODO turn this variable on once the tests are passing
 # blocked by https://github.com/bats-core/bats-core/issues/509
-declare -r is_issue_509_resolved=0
+declare -r is_issue_509_resolved=1
 if (( is_issue_509_resolved )); then
   declare -r bats_upstream_repo=https://github.com/bats-core/bats-core
 else
@@ -19,7 +19,7 @@ fi
 # TODO cleanup/rm non-vendored branch of logic once the quick-hack-testing
 # ability is no longer needed by issue 509 (see is_issue_509_resolved
 # experiment).
-declare -r use_vendored_bats=1
+declare -r use_vendored_bats=0
 if (( use_vendored_bats )); then
   if (( is_issue_509_resolved )); then
     src_dir="$baseDir/vendor/bats-core"
