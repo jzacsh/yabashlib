@@ -7,6 +7,8 @@ batsDir="$specDir/.bats"
 batsBld="$batsDir/local"
 batsExec="$batsBld/bin/bats"
 
+declare -r bats_upstream_repo=https://github.com/bats-core/bats-core
+
 # Ensure bats unit testing framework is in place
 [ ! -x "$batsExec" ] && {
   src_dir="$batsDir/src"
@@ -19,7 +21,7 @@ batsExec="$batsBld/bin/bats"
     [ -d "$batsDir" ] && rmdir "$batsDir"
     {
       [ ! -d "$batsDir" ] &&
-        git clone --quiet https://github.com/sstephenson/bats.git "$src_dir" &&
+        git clone --quiet "$bats_upstream_repo" "$src_dir" &&
         mkdir "$batsBld" &&
         "$src_dir/install.sh" "$batsBld" &&
         [ -x "$batsExec" ]
