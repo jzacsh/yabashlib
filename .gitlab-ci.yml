@@ -19,4 +19,4 @@ stages:
 unit-tests:
   stage: test
   script:
-    - ./test.sh --tap
+    - make tap
