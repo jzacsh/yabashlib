@@ -13,6 +13,11 @@ function update_repo_ref() (
 )
 
 update_repo_ref \
+  vendor/bats \
+  https://github.com/sstephenson/bats \
+  master
+
+update_repo_ref \
   vendor/bats-core \
   https://github.com/bats-core/bats-core \
   master
