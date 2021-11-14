@@ -19,7 +19,11 @@ fi
 # TODO turn this on once sstephenson/bats.git si vendored.
 declare -r use_vendored_bats=0
 if (( use_vendored_bats )); then
-  src_dir="$baseDir/vendor/bats-core"
+  if (( is_issue_509_resolved )); then
+    src_dir="$baseDir/vendor/bats-core"
+  else
+    src_dir="$baseDir/vendor/bats"
+  fi
 else
   src_dir="$batsDir/src"
 fi
