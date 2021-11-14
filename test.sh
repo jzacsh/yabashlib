@@ -9,10 +9,17 @@ batsExec="$batsBld/bin/bats"
 
 declare -r bats_upstream_repo=https://github.com/bats-core/bats-core
 
+# TODO turn this variable on once the tests are passing
+# blocked by https://github.com/bats-core/bats-core/issues/509
+declare -r use_vendored_bats=0
+if (( use_vendored_bats )); then
+  src_dir="$baseDir/vendor/bats-core"
+else
+  src_dir="$batsDir/src"
+fi
+
 # Ensure bats unit testing framework is in place
 [ ! -x "$batsExec" ] && {
-  src_dir="$batsDir/src"
-
   exec 4>/dev/null
   [[ "$@" =~ --tap ]] && safefd=4 || safefd=2
 
@@ -20,10 +27,13 @@ declare -r bats_upstream_repo=https://github.com/bats-core/bats-core
     echo 'Could not find local bats installation, installing now...' >&$safefd
     [ -d "$batsDir" ] && rmdir "$batsDir"
     {
-      [ ! -d "$batsDir" ] &&
+      [ ! -d "$batsDir" ] || exit 3
+
+      (( use_vendored_bats )) || {
         git clone --quiet "$bats_upstream_repo" "$src_dir" &&
-        mkdir "$batsBld" &&
-        "$src_dir/install.sh" "$batsBld" &&
+          mkdir "$batsBld"
+      }
+      "$src_dir/install.sh" "$batsBld" &&
         [ -x "$batsExec" ]
     } >&$safefd
 
@@ -47,7 +57,6 @@ for (( i = 1; i <= $#; ++i  ));do
     break
   }
 done
-
 
 # Execute all bats unit tests
 SRCS="$baseDir/src" \
