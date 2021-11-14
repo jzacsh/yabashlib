@@ -7,7 +7,7 @@ cd "$(git rev-parse --show-toplevel)" || exit 1
 function update_repo_ref() (
   local subpath="$1" remote="$2" ref="$3"
   set -x
-  git subtree add --squash \
+  git subtree pull --squash \
     --message 'updating vendored subtree of '"$remote" \
     --prefix "$subpath" "$remote" "$ref"
 )
