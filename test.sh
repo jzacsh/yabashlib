@@ -7,10 +7,16 @@ batsDir="$specDir/.bats"
 batsBld="$batsDir/local"
 batsExec="$batsBld/bin/bats"
 
-declare -r bats_upstream_repo=https://github.com/bats-core/bats-core
-
 # TODO turn this variable on once the tests are passing
 # blocked by https://github.com/bats-core/bats-core/issues/509
+declare -r is_issue_509_resolved=0
+if (( is_issue_509_resolved )); then
+  declare -r bats_upstream_repo=https://github.com/bats-core/bats-core
+else
+  declare -r bats_upstream_repo=https://github.com/sstephenson/bats.git
+fi
+
+# TODO turn this on once sstephenson/bats.git si vendored.
 declare -r use_vendored_bats=0
 if (( use_vendored_bats )); then
   src_dir="$baseDir/vendor/bats-core"
