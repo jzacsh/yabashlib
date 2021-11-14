@@ -36,7 +36,7 @@ fi
       [ ! -d "$batsDir" ] || exit 3
 
       if (( use_vendored_bats )); then
-        echo -e '\tutilizing vendored bats...' >&$safefd
+        echo -e '\tutilizing locally vendored bats at '$src_dir'...' >&$safefd
       else
         echo -e '\tutilizing fresh upstream code from '$bats_upstream_repo'...' >&$safefd
         git clone --quiet "$bats_upstream_repo" "$src_dir" &&
