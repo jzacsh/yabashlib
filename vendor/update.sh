@@ -21,3 +21,13 @@ update_repo_ref \
   vendor/bats-core \
   https://github.com/bats-core/bats-core \
   master
+
+update_repo_ref \
+  vendor/bats-support \
+  https://github.com/bats-core/bats-support.git \
+  master
+
+update_repo_ref \
+  vendor/bats-assert \
+  https://github.com/bats-core/bats-assert.git \
+  master
