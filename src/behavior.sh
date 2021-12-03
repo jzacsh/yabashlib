@@ -46,3 +46,25 @@ dieWithoutBash4() {
   printf "$msg" "$BASH_VERSINFO[0]"
   exit "$BEHAVIOR_EXIT_ERROR"
 }
+
+# Whether there exists a binary in $PATH by the name of "$1".
+#
+# Note: you probably want haveCallable, as this function is more concerned with
+# the implementation detail of what sort of callable "$1" actually is, which
+# generally shouldn't be in the purview of your programming.
+function haveBinary() { which "$1" >/dev/null 2>&1; }
+
+function requireBinary() {
+  haveBinary "$1" || logfFatal \
+    'Binary by the name of "%s" is a runtime dependency of this program\n' \
+    "$1"
+}
+
+# Whether there exists some command that can be called by the name "$1".
+function haveCallable() { type "$1" >/dev/null 2>&1; }
+
+function requireCallable() {
+  haveCallable "$1" || logfFatal \
+    'Command by the name of "%s" is a runtime dependency of this program\n' \
+    "$1"
+}
