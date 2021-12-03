@@ -17,6 +17,12 @@ setup() {
   [ "$output" = 'some/abs/dir///' ]
 }
 
+@test 'strTrim trims surrounding itmes' {
+  run strTrim '/////some/abs/dir///' '/'
+  [ "$status" -eq 0 ]
+  [ "$output" = 'some/abs/dir' ]
+}
+
 @test 'should reduce repeated characters to single occurrence' {
   run strStripRepeats '/////some//abs/dir///' '/'
   [ "$status" -eq 0 ]
