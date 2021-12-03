@@ -4,7 +4,8 @@ load fixture
 load mocks
 
 setup() {
-  source "$SRCS/behavior.sh" fooBarTool
+  source "$SRCS/behavior.sh"
+  setLogPrefixTo fooBarTool
   MOCK_DATE="$(date)"
 }
 
@@ -26,7 +27,6 @@ teardown() {
   [ "$status" -eq 99 ]
   [[ "${lines[0]}" =~ ^\[fooBarTool::ERROR\][[:space:]]*$MOCK_DATE$ ]]
   [[ "${lines[1]}" =~ $testMsg ]]
-  [[ "${lines[2]}" =~ ^\[fooBarTool\ exiting\ 99\]$ ]]
 }
 
 
@@ -36,7 +36,6 @@ teardown() {
   [ "$status" -eq 1 ]
   [[ "${lines[0]}" =~ ^\[fooBarTool::ERROR\][[:space:]]*$MOCK_DATE$ ]]
   [[ "${lines[1]}" =~ 'Required command exited: 89' ]]
-  [[ "${lines[2]}" =~ ^\[fooBarTool\ exiting\ 1\]$ ]]
 }
 
 
@@ -48,7 +47,6 @@ teardown() {
   [ "$status" -eq 1 ]
   [[ "${lines[0]}" =~ ^\[fooBarTool::ERROR\][[:space:]]*$MOCK_DATE$ ]]
   [[ "${lines[1]}" =~ $testMsg ]]
-  [[ "${lines[2]}" =~ ^\[fooBarTool\ exiting\ 1\]$ ]]
 }
 
 @test 'should die less than Bash v4' {

@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-source "$dir/logging.sh" $@
+# TODO if-def wrap the entirety of all yabashlib souceable scripts
 
-scriptName="$1"
-setLogPrefixTo "$scriptName"
+dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+source "$dir/logging.sh"
 
 #see /usr/include/sysexits.h
 BEHAVIOR_EXIT_ERROR=1   #general error
@@ -35,7 +34,7 @@ die() {
   local exitwith
   exitwith="$1"; shift
 
-  logError $@ "\n\n[$scriptName exiting $exitwith]"
+  logError "$@"
 
   exit "$exitwith"
 }
