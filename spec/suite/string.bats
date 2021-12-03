@@ -23,6 +23,12 @@ setup() {
   [ "$output" = 'some/abs/dir' ]
 }
 
+@test 'strTrim trims surrounding substrings larger than char' {
+  run strTrim 'BOOKENDBOOKENDsome/abs/dirBOOKEND' 'BOOKEND'
+  [ "$status" -eq 0 ]
+  [ "$output" = 'some/abs/dir' ]
+}
+
 @test 'should reduce repeated characters to single occurrence' {
   run strStripRepeats '/////some//abs/dir///' '/'
   [ "$status" -eq 0 ]
