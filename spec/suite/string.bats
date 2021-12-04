@@ -36,17 +36,27 @@ setup() {
 }
 
 @test 'strIsEmptyish detects zero-length input' {
-  skip '`strIsEmptyish` test not written'
+  run strIsEmptyish ''
+  [ "$status" -eq 0 ]
 }
 
 @test 'strIsEmptyish detects one or more spaces' {
-  skip '`strIsEmptyish` test not written'
+  run strIsEmptyish ' '
+  [ "$status" -eq 0 ]
+  run strIsEmptyish '                  '
+  [ "$status" -eq 0 ]
 }
 
 @test 'strIsEmptyish detects strange spaces like tabs' {
-  skip '`strIsEmptyish` test not written'
+  run strIsEmptyish "$(echo -e '\t \n')"
+  [ "$status" -eq 0 ]
+  run strIsEmptyish "$(echo -e '\r\t\n\n')"
+  [ "$status" -eq 0 ]
 }
 
 @test 'strStartsWith detects one is a non-strict subset and prefix of another' {
-  skip '`strStartsWith` test not written'
+  run strStartsWith 'foobar' 'foo'
+  [ "$status" -eq 0 ]
+  run strStartsWith ' foobar' ' '
+  [ "$status" -eq 0 ]
 }
