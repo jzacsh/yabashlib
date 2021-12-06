@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+function strTrim() {
+  local body="$1"
+  local trim="$2"
+
+  strTrimLeft "$(strTrimRight "$body" "$trim")" "$trim"
+}
+
 # $1=string to modify
 # $2=string to trim
 strTrimRight() (
