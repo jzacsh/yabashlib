@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+function term_is_tty_ssh() {
+  [[ -n "${SSH_CLIENT:-}" ]] || [[ -n "${SSH_TTY:-}" ]] ||
+    ( ps -o comm= -p "$PPID" | grep --quiet --extended-regexp '(sshd|*/sshd)'; )
+}
+
 function term_supports_color() {
   # 'colors' is the "capname" (see tput(1)) that outputs a numeric value from
   # the terminfo(5) database. See "numeric capabilities" listing of the terminfo
