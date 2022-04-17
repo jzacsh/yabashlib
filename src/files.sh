@@ -13,6 +13,12 @@ isFileAnOnlyChild() {
 # $1 = file to check for emptiness of
 isNonemptyFile() { [[ -n "$1" && -s "$1" && -f "$1" ]]; }
 
+# $1 = directory to check for emptiness of
+isNonemptyDir() {
+  [[ -n "$1" && -d "$1" ]] || return 1
+  ! isDirectoryEmpty "$1"
+}
+
 # $1 = directory to check is empty
 isDirectoryEmpty() {
   [[ "$(find "$1")" = "$1" ]]
