@@ -46,7 +46,8 @@ function strIsEmptyish() {
 
 # Whether string "$1" starts with string "$2"
 function strStartsWith() {
-  local haystack="$1" start_substr="$2"
-  local substr_regexp='^'"$start_substr"
-  [[  "$haystack" =~ $substr_regexp ]]
+  local haystack="$1" needle="$2"
+  local needle_length="${#needle}"
+  local haystack_subset="${haystack:0:$needle_length}"
+  [[ "$haystack_subset" = "$needle" ]]
 }
