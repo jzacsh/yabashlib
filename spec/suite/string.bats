@@ -61,6 +61,11 @@ setup() {
   [ "$status" -eq 0 ]
 }
 
+@test 'strStartsWith detects negative cases' {
+  run strStartsWith '$foobar' 'foo'
+  [ "$status" -ne 0 ]
+}
+
 @test 'strStartsWith is robust against chars that would look like regexp syntax' {
   run strStartsWith '$foobar' '$'
   [ "$status" -eq 0 ]

@@ -44,7 +44,7 @@ function strIsEmptyish() {
   [[ -z "$1" || "$1" =~ $empty_regexp ]]
 }
 
-# Whether string "$1" starts with string "$2"
+# Whether string "$1" (haystack) starts with string "$2" (needle).
 function strStartsWith() {
   local haystack="$1" needle="$2"
   local needle_length="${#needle}"
