@@ -69,3 +69,22 @@ function strIsWholenumber() (
   local nonneg_naturals_regexp='^[[:digit:]]+$'
   [[ "$1" =~ $nonneg_naturals_regexp ]]
 )
+
+# Returns $1 repeated N times.
+function strRepeatN() {
+  local content="$1" multiplier="$2"
+  strIsWholenumber "$multiplier" || return 1
+  [[ "$multiplier" -gt 0 ]] || {
+    echo
+    return
+  }
+
+  local printf_overload_args
+  printf_overload_args="$(seq --separator=' ' 1 "$multiplier")"
+
+  local template
+  # purposely do'nt quote $printf_overload_args
+  printf -v template -- '-%.s' $printf_overload_args
+  printf -- '%s\n' \
+    "${template//-/$content}"
+}

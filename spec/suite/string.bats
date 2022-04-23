@@ -117,3 +117,17 @@ setup() {
   run strIsWholenumber '  '
   [ "$status" -ne 0 ]
 }
+
+@test 'strRepeatN repeats the first arg number of times given by second arg' {
+  run strRepeatN foo 0
+  [ "$status" -eq 0 ]
+  [ "$output" = '' ]
+
+  run strRepeatN foo 1
+  [ "$status" -eq 0 ]
+  [ "$output" = 'foo' ]
+
+  run strRepeatN foo 8
+  [ "$status" -eq 0 ]
+  [ "$output" = 'foofoofoofoofoofoofoofoo' ]
+}
