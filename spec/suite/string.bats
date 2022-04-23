@@ -86,3 +86,34 @@ setup() {
   run strContains 'fo$o' 'baz'
   [ "$status" -ne 0 ]
 }
+
+@test 'strIsWholenumber detects non negative numbers' {
+  run strIsWholenumber 10
+  [ "$status" -eq 0 ]
+
+  run strIsWholenumber 3824
+  [ "$status" -eq 0 ]
+
+  run strIsWholenumber 0
+  [ "$status" -eq 0 ]
+}
+
+@test 'strIsWholenumber handles negative cases' {
+  run strIsWholenumber '1 2'
+  [ "$status" -ne 0 ]
+
+  run strIsWholenumber 1.2
+  [ "$status" -ne 0 ]
+
+  run strIsWholenumber -10
+  [ "$status" -ne 0 ]
+
+  run strIsWholenumber foo
+  [ "$status" -ne 0 ]
+
+  run strIsWholenumber 'fo$o'
+  [ "$status" -ne 0 ]
+
+  run strIsWholenumber '  '
+  [ "$status" -ne 0 ]
+}

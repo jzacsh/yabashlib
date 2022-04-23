@@ -60,3 +60,13 @@ function strContains() {
   haystack_without_needle="${haystack/$needle/}"
   [[ "$haystack_without_needle" != "$haystack" ]]
 }
+
+# Whether $1 is a non-negative integer - ie: either 0 or one of the natural
+# numbers.
+function strIsWholenumber() (
+  set -o compat31
+  # for character classes, see:
+  # https://pubs.opengroup.org/onlinepubs/009696899/basedefs/xbd_chap07.html#tag_07_03_01
+  local nonneg_naturals_regexp='^[[:digit:]]+$'
+  [[ "$1" =~ $nonneg_naturals_regexp ]]
+)
