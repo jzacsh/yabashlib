@@ -51,3 +51,12 @@ function strStartsWith() {
   local haystack_subset="${haystack:0:$needle_length}"
   [[ "$haystack_subset" = "$needle" ]]
 }
+
+# Whether string "$1" (haystack) contains string "$2" (needle).
+function strContains() {
+  local haystack="$1" needle="$2"
+  [[ "${#haystack}" -ge "${#needle}" ]] || return 1
+  local haystack_without_needle
+  haystack_without_needle="${haystack/$needle/}"
+  [[ "$haystack_without_needle" != "$haystack" ]]
+}

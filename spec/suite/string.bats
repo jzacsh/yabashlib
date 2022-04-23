@@ -70,3 +70,19 @@ setup() {
   run strStartsWith '$foobar' '$'
   [ "$status" -eq 0 ]
 }
+
+@test 'strContains detects haystack is a superset of needle' {
+  run strContains 'foobar' 'oba'
+  [ "$status" -eq 0 ]
+
+  run strContains 'fo$obar' '$'
+  [ "$status" -eq 0 ]
+}
+
+@test 'strContains detects negative cases' {
+  run strContains 'foo' 'baz'
+  [ "$status" -ne 0 ]
+
+  run strContains 'fo$o' 'baz'
+  [ "$status" -ne 0 ]
+}
