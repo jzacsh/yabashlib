@@ -59,3 +59,9 @@ is_same_content() ( diff "$1" "$2" >/dev/null 2>&1; )
 
 # TODO add tests
 is_same_file() ( [[ "$(readlink --canonicalize "$1")" = "$(readlink --canonicalize "$2")" ]]; )
+
+# Lists the files that would normally be listed by bash (eg: if you have a for
+# loop over a path glob).
+function listBashGlob() { compgen -G "$1"; }
+
+function isFilledBashGlob() { listBashGlob "$@" > /dev/null 2>&1; }
