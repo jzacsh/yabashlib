@@ -55,7 +55,9 @@ dieWithoutBash4() {
 function haveBinary() {
   # for relevant history and context for any implementation choices made here:
   #   https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then/85250#85250
-  which "$1" >/dev/null 2>&1
+  local description
+  description="$(command -v "$1" >/dev/null 2>&1)" || return 1
+  [[ -n "$description" ]] # whether non-empty (empty in the case of builtins, aliases, etc.)
 }
 
 function requireBinary() {
@@ -68,7 +70,7 @@ function requireBinary() {
 function haveCallable() {
   # for relevant history and context for any implementation choices made here:
   #   https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then/85250#85250
-  type "$1" >/dev/null 2>&1
+  command -v "$1" >/dev/null 2>&1
 }
 
 function requireCallable() {
