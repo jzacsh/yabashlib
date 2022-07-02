@@ -52,7 +52,11 @@ dieWithoutBash4() {
 # Note: you probably want haveCallable, as this function is more concerned with
 # the implementation detail of what sort of callable "$1" actually is, which
 # generally shouldn't be in the purview of your programming.
-function haveBinary() { which "$1" >/dev/null 2>&1; }
+function haveBinary() {
+  # for relevant history and context for any implementation choices made here:
+  #   https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then/85250#85250
+  which "$1" >/dev/null 2>&1
+}
 
 function requireBinary() {
   haveBinary "$1" || logfFatal \
@@ -61,7 +65,11 @@ function requireBinary() {
 }
 
 # Whether there exists some command that can be called by the name "$1".
-function haveCallable() { type "$1" >/dev/null 2>&1; }
+function haveCallable() {
+  # for relevant history and context for any implementation choices made here:
+  #   https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then/85250#85250
+  type "$1" >/dev/null 2>&1
+}
 
 function requireCallable() {
   haveCallable "$1" || logfFatal \
