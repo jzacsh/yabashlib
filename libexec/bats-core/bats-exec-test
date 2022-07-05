@@ -2,8 +2,6 @@
 set -eET
 
 # Variables used in other scripts.
-BATS_COUNT_ONLY=''
-BATS_TEST_FILTER=''
 BATS_ENABLE_TIMING=''
 BATS_EXTENDED_SYNTAX=''
 BATS_TRACE_LEVEL="${BATS_TRACE_LEVEL:-0}"
@@ -11,24 +9,18 @@ BATS_PRINT_OUTPUT_ON_FAILURE="${BATS_PRINT_OUTPUT_ON_FAILURE:-}"
 BATS_SHOW_OUTPUT_OF_SUCCEEDING_TESTS="${BATS_SHOW_OUTPUT_OF_SUCCEEDING_TESTS:-}"
 BATS_VERBOSE_RUN="${BATS_VERBOSE_RUN:-}"
 BATS_GATHER_TEST_OUTPUTS_IN="${BATS_GATHER_TEST_OUTPUTS_IN:-}"
+BATS_TEST_NAME_PREFIX="${BATS_TEST_NAME_PREFIX:-}"
 
 while [[ "$#" -ne 0 ]]; do
   case "$1" in
-  -c)
-    # shellcheck disable=SC2034
-    BATS_COUNT_ONLY=1
-    ;;
-  -f)
-    shift
-    # shellcheck disable=SC2034
-    BATS_TEST_FILTER="$1"
-    ;;
   -T)
     BATS_ENABLE_TIMING='-T'
     ;;
   -x)
     # shellcheck disable=SC2034
     BATS_EXTENDED_SYNTAX='-x'
+    ;;
+  --dummy-flag)
     ;;
   --trace)
     (( ++BATS_TRACE_LEVEL )) # avoid returning 0
@@ -67,7 +59,7 @@ elif [[ ! -f "$BATS_TEST_FILENAME" ]]; then
 fi
 
 bats_create_test_tmpdirs() {
-  local tests_tmpdir="${BATS_RUN_TMPDIR}/test/"
+  local tests_tmpdir="${BATS_RUN_TMPDIR}/test"
   if ! mkdir -p "$tests_tmpdir"; then
     printf 'Failed to create: %s\n' "$tests_tmpdir" >&2
     exit 1
@@ -92,18 +84,18 @@ source "$BATS_ROOT/lib/bats-core/tracing.bash"
 
 bats_teardown_trap() {
   bats_check_status_from_trap
-  local status=0
+  local bats_teardown_trap_status=0
   # mark the start of this function to distinguish where skip is called
   # parameter 1 will signify the reason why this function was called
   # this is used to identify when this is called as exit trap function
   BATS_TEARDOWN_STARTED=${1:-1}
-  teardown >>"$BATS_OUT" 2>&1 || status="$?"
+  teardown >>"$BATS_OUT" 2>&1 || bats_teardown_trap_status="$?"
 
-  if [[ $status -eq 0 ]]; then
+  if [[ $bats_teardown_trap_status -eq 0 ]]; then
     BATS_TEARDOWN_COMPLETED=1
   elif [[ -n "$BATS_TEST_COMPLETED" ]]; then
     BATS_DEBUG_LAST_STACK_TRACE_IS_VALID=1
-    BATS_ERROR_STATUS="$status"
+    BATS_ERROR_STATUS="$bats_teardown_trap_status"
   fi
 
   bats_exit_trap
@@ -144,7 +136,7 @@ bats_exit_trap() {
       # output, since there's no way to reach the `bats_exit_trap` call.
       BATS_ERROR_STATUS=1
     fi
-    printf 'not ok %d %s\n' "$BATS_SUITE_TEST_NUMBER" "${BATS_TEST_DESCRIPTION}${BATS_TEST_TIME}" >&3
+    printf 'not ok %d %s\n' "$BATS_SUITE_TEST_NUMBER" "${BATS_TEST_NAME_PREFIX:-}${BATS_TEST_DESCRIPTION}${BATS_TEST_TIME}" >&3
     local stack_trace
     bats_get_failure_stack_trace stack_trace
     bats_print_stack_trace "${stack_trace[@]}" >&3
@@ -156,14 +148,18 @@ bats_exit_trap() {
 
     print_bats_out=1
     status=1
+    local state=failed
   else
-    printf 'ok %d %s%s\n' "$BATS_SUITE_TEST_NUMBER" "${BATS_TEST_DESCRIPTION}${BATS_TEST_TIME}" \
+    printf 'ok %d %s%s\n' "$BATS_SUITE_TEST_NUMBER" "${BATS_TEST_NAME_PREFIX:-}${BATS_TEST_DESCRIPTION}${BATS_TEST_TIME}" \
       "$skipped" >&3
     status=0
+    local state=passed
   fi
 
+  printf "%s %s\t%s\n" "$state" "$BATS_TEST_FILENAME" "$BATS_TEST_NAME" >> "$BATS_RUNLOG_FILE"
+
   if [[ $print_bats_out ]]; then
-    bats_prefix_lines_for_tap_output < "$BATS_OUT" >&3
+    bats_prefix_lines_for_tap_output < "$BATS_OUT" | bats_replace_filename >&3
   fi
 
   if [[ $BATS_GATHER_TEST_OUTPUTS_IN ]]; then
@@ -188,7 +184,9 @@ get_mills_since_epoch() {
 
 bats_perform_test() {
   if ! declare -F "$BATS_TEST_NAME" &>/dev/null; then
-    printf "bats: unknown test name \`%s'\n" "$BATS_TEST_NAME" >&2
+    local quoted_test_name
+    bats_quote_code quoted_test_name "$BATS_TEST_NAME"
+    printf "bats: unknown test name %s\n" "$quoted_test_name" >&2
     exit 1
   fi
 

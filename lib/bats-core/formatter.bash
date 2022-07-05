@@ -38,20 +38,21 @@ function bats_parse_internal_extended_tap() {
         'begin '*) # this might only be called in extended tap output
             ((++begin_index))
             scope=begin
-            test_name="${line#* $begin_index }"
+            test_name="${line#* "$begin_index" }"
             bats_tap_stream_begin "$begin_index" "$test_name"
             ;;
         'ok '*)
             ((++index))
-            scope=ok
             if [[ "$line" =~ $ok_line_regexpr ]]; then
                 ok_index="${BASH_REMATCH[1]}"
                 test_name="${BASH_REMATCH[2]}"
                 if [[ "$line" =~ $skip_line_regexpr ]]; then
+                    scope=skipped
                     test_name="${BASH_REMATCH[2]}" # cut off name before "# skip"
                     local skip_reason="${BASH_REMATCH[4]}"
                     bats_tap_stream_skipped "$ok_index" "$test_name" "$skip_reason"
                 else
+                    scope=ok
                     if [[ "$line" =~ $timing_expr ]]; then
                         bats_tap_stream_ok --duration "${BASH_REMATCH[1]}" "$ok_index" "$test_name"
                     else
@@ -82,6 +83,9 @@ function bats_parse_internal_extended_tap() {
         '# '*)
             bats_tap_stream_comment "${line:2}" "$scope"
             ;;
+        '#')
+            bats_tap_stream_comment "" "$scope"
+            ;;
         'suite '*) 
             scope=suite
             # pass on the
@@ -92,22 +96,6 @@ function bats_parse_internal_extended_tap() {
         ;;
         esac
     done
-}
-
-# given a prefix and a path, remove the prefix if the path starts with it
-# e.g. 
-# remove_prefix /usr/bin /usr/bin/bash -> bash
-# remove_prefix /usr /usr/lib/bash -> lib/bash
-# remove_prefix /usr/bin /usr/local/bin/bash -> /usr/local/bin/bash
-remove_prefix() {
-  base_path="$1"
-  path="$2"
-  if [[ "$path" == "$base_path"* ]]; then
-    # cut off the common prefix
-    printf "%s" "${path:${#base_path}}"
-  else
-    printf "%s" "$path"
-  fi
 }
 
 normalize_base_path() { # <target variable> <base path>
