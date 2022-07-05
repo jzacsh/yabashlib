@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# shellcheck source=lib/bats-core/common.bash
+source "$BATS_ROOT/lib/bats-core/common.bash"
+
 bats_capture_stack_trace() {
 	local test_file
 	local funcname
@@ -14,7 +17,7 @@ bats_capture_stack_trace() {
 		funcname="${FUNCNAME[$i]}"
 		BATS_DEBUG_LAST_STACK_TRACE+=("${BASH_LINENO[$((i-1))]} $funcname $test_file")
 		case "$funcname" in
-		"$BATS_TEST_NAME" | setup | teardown | setup_file | teardown_file)
+		"$BATS_TEST_NAME" | setup | teardown | setup_file | teardown_file | setup_suite | teardown_suite)
 			break
 			;;
 		esac
@@ -52,10 +55,11 @@ bats_print_stack_trace() {
 		bats_trim_filename "$filename" 'filename'
 		bats_frame_lineno "$frame" 'lineno'
 
+		printf '%s' "${BATS_STACK_TRACE_PREFIX-# }"
 		if [[ $index -eq 1 ]]; then
-			printf '# ('
+			printf '('
 		else
-			printf '#  '
+			printf ' '
 		fi
 
 		local fn
@@ -64,7 +68,9 @@ bats_print_stack_trace() {
 			# don't print "from function `source'"",
 			# when failing in free code during `source $test_file` from bats-exec-file
 			! [[ "$fn" == 'source' &&  $index -eq $count ]]; then 
-			printf "from function \`%s' " "$fn"
+			local quoted_fn
+			bats_quote_code quoted_fn "$fn"
+			printf "from function %s " "$quoted_fn"
 		fi
 
 		if [[ $index -eq $count ]]; then
@@ -92,7 +98,9 @@ bats_print_failed_command() {
 	bats_frame_lineno "$frame" 'lineno'
 	bats_extract_line "$filename" "$lineno" 'failed_line'
 	bats_strip_string "$failed_line" 'failed_command'
-	printf '%s' "#   \`${failed_command}' "
+	local quoted_failed_command
+	bats_quote_code quoted_failed_command "$failed_command"
+	printf '#   %s ' "${quoted_failed_command}"
 
 	if [[ "$BATS_ERROR_STATUS" -eq 1 ]]; then
 		printf 'failed%s\n' "$BATS_ERROR_SUFFIX"
@@ -138,14 +146,16 @@ bats_strip_string() {
 }
 
 bats_trim_filename() {
-	printf -v "$2" '%s' "${1#$BATS_CWD/}"
+	printf -v "$2" '%s' "${1#"$BATS_CWD"/}"
 }
 
 # normalize a windows path from e.g. C:/directory to /c/directory
 # The path must point to an existing/accessable directory, not a file!
 bats_normalize_windows_dir_path() { # <output-var> <path>
-	local output_var="$1"
-	local path="$2"
+	local output_var="$1" path="$2"
+	if [[ "$output_var" != NORMALIZED_INPUT ]]; then
+		local NORMALIZED_INPUT
+	fi
 	if [[ $path == ?:* ]]; then
 		NORMALIZED_INPUT="$(cd "$path" || exit 1; pwd)"
 	else
@@ -232,7 +242,7 @@ bats_debug_trap() {
 	local NORMALIZED_INPUT
 	bats_normalize_windows_dir_path NORMALIZED_INPUT "${1%/*}"
 	local file_excluded='' path
-	for path in "${_BATS_DEBUG_EXCLUDE_PATHS[@]}"; do
+	for path in "${BATS_DEBUG_EXCLUDE_PATHS[@]}"; do
 		if [[ "$NORMALIZED_INPUT" == "$path"* ]]; then
 			file_excluded=1
 			break
@@ -280,15 +290,16 @@ bats_add_debug_exclude_path() { # <path>
 		return 1
 	fi
 	if [[ "$OSTYPE" == cygwin || "$OSTYPE" == msys ]]; then
+		local normalized_dir
 		bats_normalize_windows_dir_path normalized_dir "$1"
-		_BATS_DEBUG_EXCLUDE_PATHS+=("$normalized_dir")
+		BATS_DEBUG_EXCLUDE_PATHS+=("$normalized_dir")
 	else
-		_BATS_DEBUG_EXCLUDE_PATHS+=("$1")
+		BATS_DEBUG_EXCLUDE_PATHS+=("$1")
 	fi
 }
 
 bats_setup_tracing() {
-	_BATS_DEBUG_EXCLUDE_PATHS=()
+	BATS_DEBUG_EXCLUDE_PATHS=()
 	# exclude some paths by default
 	bats_add_debug_exclude_path "$BATS_ROOT/lib/"
 	bats_add_debug_exclude_path "$BATS_ROOT/libexec/"
@@ -307,6 +318,7 @@ bats_setup_tracing() {
 		done < <(find "$PWD" -type d -name bats-assert -o -name bats-support)
 	fi
 
+	local exclude_paths path
 	# exclude user defined libraries
 	IFS=':' read -r exclude_paths <<< "${BATS_DEBUG_EXCLUDE_PATHS:-}"
 	for path in "${exclude_paths[@]}"; do

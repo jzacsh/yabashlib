@@ -9,7 +9,7 @@ emulate_bats_env() {
 fixtures() {
   FIXTURE_ROOT="$BATS_TEST_DIRNAME/fixtures/$1"
   # shellcheck disable=SC2034
-  RELATIVE_FIXTURE_ROOT="${FIXTURE_ROOT#$BATS_CWD/}"
+  RELATIVE_FIXTURE_ROOT="${FIXTURE_ROOT#"$BATS_CWD"/}"
 }
 
 filter_control_sequences() {
@@ -26,11 +26,4 @@ fi
 emit_debug_output() {
   # shellcheck disable=SC2154
   printf '%s\n' 'output:' "$output" >&2
-}
-
-run_under_clean_bats_env() {
-  # we want the variable names to be separate
-  # shellcheck disable=SC2086
-  unset ${!BATS_@}
-  "$@"
 }

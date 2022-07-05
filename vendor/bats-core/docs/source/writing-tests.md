@@ -12,6 +12,23 @@ For sample test files, see [examples](https://github.com/bats-core/bats-core/tre
 
 [bats-eval]: https://github.com/bats-core/bats-core/wiki/Bats-Evaluation-Process
 
+## Comment syntax
+
+External tools (like `shellcheck`, `shfmt`, and various IDE's) may not support
+the standard `.bats` syntax.  Because of this, we provide a valid `bash`
+alternative:
+
+```bash
+function invoking_foo_without_arguments_prints_usage { #@test
+  run foo
+  [ "$status" -eq 1 ]
+  [ "${lines[0]}" = "usage: foo <filename>" ]
+}
+```
+
+When using this syntax, the function name will be the title in the result output
+and the value checked when using `--filter`.
+
 ## `run`: Test other commands
 
 Many Bats tests need to run a command and then make assertions about its exit
@@ -42,7 +59,7 @@ If invoked with one of the following as the first argument, `run`
 will perform an implicit check on the exit status of the invoked command:
 
 ```pre
-    =N  expect exit status N (0-255), fail if otherwise
+    -N  expect exit status N (0-255), fail if otherwise
     ! expect nonzero exit status (1-255), fail if command succeeds
 ```
 
@@ -80,29 +97,13 @@ All additional parameters to run should come before the command.
 If you want to run a command that starts with `-`, prefix it with `--` to
 prevent `run` from parsing it as an option.
 
-## Comment syntax
-
-External tools (like `shellcheck`, `shfmt`, and various IDE's) may not support
-the standard `.bats` syntax.  Because of this, we provide a valid `bash`
-alternative:
-
-```bash
-function invoking_foo_without_arguments_prints_usage { #@test
-  run foo
-  [ "$status" -eq 1 ]
-  [ "${lines[0]}" = "usage: foo <filename>" ]
-}
-```
-
-When using this syntax, the function name will be the title in the result output
-and the value checked when using `--filter`.
-
 ## `load`: Share common code
 
-You may want to share common code across multiple test files. Bats includes a
-convenient `load` command for sourcing a Bash source file relative to the
-location of the current test file. For example, if you have a Bats test in
-`test/foo.bats`, the command
+You may want to share common code across multiple test files. Bats
+includes a convenient `load` command for sourcing a Bash source files
+relative to the current test file and from absolute paths.
+
+For example, if you have a Bats test in `test/foo.bats`, the command
 
 ```bash
 load test_helper.bash
@@ -111,17 +112,82 @@ load test_helper.bash
 will source the script `test/test_helper.bash` in your test file (limitations
 apply, see below). This can be useful for sharing functions to set up your
 environment or load fixtures. `load` delegates to Bash's `source` command after
-resolving relative paths.
+resolving paths.
 
-As pointed out by @iatrou in <https://www.tldp.org/LDP/abs/html/declareref.html>,
+If `load` encounters errors - e.g. because the targeted source file
+errored - it will print a message with the failing library and Bats
+exits.
+
+To allow to use `load` in conditions `bats_load_safe` has been added.
+`bats_load_safe` prints a message and returns `1` if a source file cannot be
+loaded instead of exiting Bats.
+Aside from that `bats_load_safe` acts exactly like `load`.
+
+As pointed out by @iatrou in https://www.tldp.org/LDP/abs/html/declareref.html,
 using the `declare` builtin restricts scope of a variable. Thus, since actual
 `source`-ing is performed in context of the `load` function, `declare`d symbols
 will _not_ be made available to callers of `load`.
+
+### `load` argument resolution
+
+`load` supports the following arguments:
+
+- absolute paths
+- relative paths (to the current test file)
 
 > For backwards compatibility `load` first searches for a file ending in
 > `.bash` (e.g. `load test_helper` searches for `test_helper.bash` before
 > it looks for `test_helper`). This behaviour is deprecated and subject to
 > change, please use exact filenames instead.
+
+If `argument` is an absolute path `load` tries to determine the load
+path directly.
+
+If `argument` is a relative path or a name `load` looks for a matching
+path in the directory of the current test.
+
+## `bats_load_library`: Load system wide libraries
+
+Some libraries are installed on the system, e.g. by `npm` or `brew`.
+These should not be `load`ed, as their path depends on the installation method.
+Instead, one should use `bats_load_library` together with setting
+`BATS_LIB_PATH`, a `PATH`-like colon-delimited variable.
+
+`bats_load_library` has two modes of resolving requests:
+
+1. by relative path from the `BATS_LIB_PATH` to a file in the library
+2. by library name, expecting libraries to have a `load.bash` entrypoint
+
+For example if your `BATS_LIB_PATH` is set to
+`~/.bats/libs:/usr/lib/bats`, then `bats_load_library test_helper`
+would look for existing files with the following paths:
+
+- `~/.bats/libs/test_helper`
+- `~/.bats/libs/test_helper/load.bash`
+- `/usr/lib/bats/test_helper`
+- `/usr/lib/bats/test_helper/load.bash`
+
+The first existing file in this list will be sourced.
+
+If you want to load only part of a library or the entry point is not named `load.bash`,
+you have to include it in the argument:
+`bats_load_library library_name/file_to_load` will try
+
+- `~/.bats/libs/library_name/file_to_load`
+- `~/.bats/libs/library_name/file_to_load/load.bash`
+- `/usr/lib/bats/library_name/file_to_load`
+- `/usr/lib/bats/library_name/file_to_load/load.bash`
+
+Apart from the changed lookup rules, `bats_load_library` behaves like `load`.
+
+__Note:__ As seen above `load.bash` is the entry point for libraries and
+meant to load more files from its directory or other libraries.
+
+__Note:__ Obviously, the actual `BATS_LIB_PATH` is highly dependant on the environment.
+To maintain a uniform location across systems, (distribution) package maintainers
+are encouraged to use `/usr/lib/bats/` as the install path for libraries where possible.
+However, if the package manager has another preferred location, like `npm` or `brew`,
+you should use this instead.
 
 ## `skip`: Easily skip tests
 
@@ -167,31 +233,62 @@ You can define special `setup` and `teardown` functions, which run before and
 after each test case, respectively. Use these to load fixtures, set up your
 environment, and clean up when you're done.
 
-You can also define `setup_file` and `teardown_file`, which will run once before the first test's `setup` and after the last test's `teardown` for the containing file. Variables that are exported in `setup_file` will be visible to all following functions (`setup`, the test itself, `teardown`, `teardown_file`).
+You can also define `setup_file` and `teardown_file`, which will run once before
+the first test's `setup` and after the last test's `teardown` for the containing
+file. Variables that are exported in `setup_file` will be visible to all following
+functions (`setup`, the test itself, `teardown`, `teardown_file`).
+
+Similarly, there is `setup_suite` (and `teardown_suite`) which run once before (and
+after) all tests of the test run.
 
 <!-- markdownlint-disable  MD033 -->
 <details>
-  <summary>Example of setup/setup_file/teardown/teardown_file call order</summary>
-For example the following call order would result from two files (file 1 with tests 1 and 2, and file 2 with test3) beeing tested:
+  <summary>Example of setup/{,_file,_suite} (and teardown{,_file,_suite}) call order</summary>
+For example the following call order would result from two files (file 1 with
+tests 1 and 2, and file 2 with test3) with a corresponding `setup_suite.bash` file beeing tested:
 
 ```text
-setup_file # from file 1, on entering file 1
-  setup
-    test1
-  teardown
-  setup
-    test2
-  teardown
-teardown_file # from file 1, on leaving file 1
-setup_file # from file 2,  on enter file 2
-  setup
-    test3
-  teardown
-teardown_file # from file 2,  on leaving file 2
+setup_suite # from setup_suite.bash
+  setup_file # from file 1, on entering file 1
+    setup
+      test1
+    teardown
+    setup
+      test2
+    teardown
+  teardown_file # from file 1, on leaving file 1
+  setup_file # from file 2,  on enter file 2
+    setup
+      test3
+    teardown
+  teardown_file # from file 2,  on leaving file 2
+teardown_suite # from setup_suite.bash
 ```
 
 </details>
 <!-- markdownlint-enable MD033 -->
+
+## `bats_require_minimum_version <Bats version number>`
+
+Added in [v1.7.0](https://github.com/bats-core/bats-core/releases/tag/v1.7.0)
+
+Code for newer versions of Bats can be incompatible with older versions.
+In the best case this will lead to an error message and a failed test suite.
+In the worst case, the tests will pass erronously, potentially masking a failure.
+
+Use `bats_require_minimum_version <Bats version number>` to avoid this.
+It communicates in a concise manner, that you intend the following code to be run
+under the given Bats version or higher.
+
+Additionally, this function will communicate the current Bats version floor to
+subsequent code, allowing e.g. Bats' internal warning to give more informed warnings.
+
+__Note__: By default, calling `bats_require_minimum_version` with versions before
+Bats 1.7.0 will fail regardless of the required version as the function is not
+available. However, you can use the
+[bats-backports plugin](https://github.com/bats-core/bats-backports) to make
+your code usable with older versions, e.g. during migration while your CI system
+is not yet upgraded.
 
 ## Code outside of test cases
 
@@ -225,7 +322,7 @@ that may launch long-running child processes**, e.g. `command_name 3>&-` .
 
 ## Printing to the terminal
 
-Bats produces output compliant with [version 12 of the TAP protocol][TAP]. The
+Bats produces output compliant with [version 12 of the TAP protocol](https://testanything.org/tap-specification.html). The
 produced TAP stream is by default piped to a pretty formatter for human
 consumption, but if Bats is called with the `-t` flag, then the TAP stream is
 directly printed to the console.
@@ -276,6 +373,8 @@ There are several global variables you can use to introspect on Bats tests:
 - `$BATS_TEST_DIRNAME` is the directory in which the Bats test file is located.
 - `$BATS_TEST_NAMES` is an array of function names for each test case.
 - `$BATS_TEST_NAME` is the name of the function containing the current test case.
+- `BATS_TEST_NAME_PREFIX` will be prepended to the description of each test on 
+   stdout and in reports.
 - `$BATS_TEST_DESCRIPTION` is the description of the current test case.
 - `$BATS_TEST_NUMBER` is the (1-based) index of the current test case in the test file.
 - `$BATS_SUITE_TEST_NUMBER` is the (1-based) index of the current test case in the test suite (over all files).
@@ -292,6 +391,7 @@ There are several global variables you can use to introspect on Bats tests:
   Could be used to create files required by multiple tests in the same test file.
 - `$BATS_TEST_TMPDIR` is a temporary directory unique for each test.
   Could be used to create files required only for specific tests.
+- `$BATS_VERSION` is the version of Bats running the test.
 
 ## Libraries and Add-ons
 
