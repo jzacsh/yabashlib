@@ -38,6 +38,9 @@ strStripRepeats() (
   echo -n "${body//+($repeat)/$repeat}"
 )
 
+# Whether string "$1" has non-empty/whitespace content.
+function strIsContentful() { ! strIsEmptyish "$1"; }
+
 # Whether string "$1" is either empty or practically empty (whitespace).
 function strIsEmptyish() {
   local empty_regexp='^[[:space:]]*$'
