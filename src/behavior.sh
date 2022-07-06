@@ -53,11 +53,10 @@ dieWithoutBash4() {
 # the implementation detail of what sort of callable "$1" actually is, which
 # generally shouldn't be in the purview of your programming.
 function haveBinary() {
+  haveCallable "$1" || return 1
   # for relevant history and context for any implementation choices made here:
   #   https://unix.stackexchange.com/questions/85249/why-not-use-which-what-to-use-then/85250#85250
-  local description
-  description="$(command -v "$1" >/dev/null 2>&1)" || return 1
-  [[ -n "$description" ]] # whether non-empty (empty in the case of builtins, aliases, etc.)
+  [[ "$(type -t "$1")" = file ]]
 }
 
 function requireBinary() {
