@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/behavior.sh"
+
 # $1 = file to check for siblings of
 isFileAnOnlyChild() {
   local parentDir numChildren
@@ -65,3 +67,19 @@ is_same_file() ( [[ "$(readlink --canonicalize "$1")" = "$(readlink --canonicali
 function listBashGlob() { compgen -G "$1"; }
 
 function isFilledBashGlob() { listBashGlob "$@" > /dev/null 2>&1; }
+
+# NOTE: (specific to pagecmd) if anything fails we assume it's a non-text file
+# (even if the failure was tha tI cannot find the file).
+function yblib.isTextishFile() {
+  local file="$1" mimeType
+
+  haveCallable file || {
+    printf 'yabashlib called with a missing dependency (file)\n' >&2
+    return 3
+  }
+
+  mimeType="$(file --brief --mime-type --dereference "$file")" || return 1
+
+  local regexpText='^text/' # mimetype tree prefix
+  [[ "$mimeType" =~ $regexpText ]]
+}
