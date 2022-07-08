@@ -59,8 +59,10 @@ function term_confirm() {
 # $2=destination command
 function yblib.cloneCompletion() {
   local orig="$1" dest="$2"
+  yblib.haveCompletion "$orig" || return 1
+
   local completion
-  completion="$(complete -p "$orig")" || return 1
+  completion="$(complete -p "$orig")"
 
   local cmd_line="${completion% "$orig"}"
 
@@ -72,3 +74,14 @@ function yblib.cloneCompletion() {
   # space. This example hasn't been tested for this functoin.
   $cmd_line "$dest"
 }
+
+# $1 the program for which we should determine if completion exists
+#
+# TODO make heuristic here better; somehow gradle on nixos defies our
+# implementation.
+#   Problem: somehow nixos gradle-completion doesn't run until _after_ I
+#   try to complete against gradle; that is:
+#   - 1) complete -p gradle  # no output; just error
+#   - 2) gradle[TAB]         # magically working
+#   - 3) complete -p gradle  # outputs gradle-completion binding
+function yblib.haveCompletion() { complete -p "$1" >/dev/null 2>&1; }
