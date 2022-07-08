@@ -51,3 +51,24 @@ function term_confirm_optout() {
 function term_confirm() {
   term_confirm_optin "$@"
 }
+
+# Copies some original command($1)'s bash completion to and runs it for a new
+# command ($2).
+#
+# $1=original command you're copying for
+# $2=destination command
+function yblib.cloneCompletion() {
+  local orig="$1" dest="$2"
+  local completion
+  completion="$(complete -p "$orig")" || return 1
+
+  local cmd_line="${completion% "$orig"}"
+
+  # purposely don't quote so that we can get word-splitting on what's currently
+  # just a single long string
+  #
+  # WARNING this is vulnerable to all the problems of word-splitting: we don't
+  # know if one of the args was actually a two-part arg separated with a quoted
+  # space. This example hasn't been tested for this functoin.
+  $cmd_line "$dest"
+}
