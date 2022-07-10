@@ -38,6 +38,7 @@ function yblib.getGnulinuxPackageSrc() {
       dpkg -S "$pkgFile" || return 1
       ;;
     *) return 1;; # distro not yet implemented
+    # TODO implement nixos; see https://unix.stackexchange.com/q/665692/239551
   esac
 }
 
