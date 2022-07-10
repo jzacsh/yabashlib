@@ -6,19 +6,16 @@
 
 source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/console.sh"
 
+declare -r __yblibLogDefaultPrefix=yblib
+
 # $1 = optionally set 'your_prefix'
 setLogPrefixTo() {
-  if (( $# == 1 )); then
-    STAMP_PREFIX_="${1}::"
-  else
-    setLogPrefixTo 'logging'
-  fi
+  (( $# == 1 )) || return 1
+
+  STAMP_PREFIX_="$1"
 }
 
-getLogPrefix() {
-  [[ -e "${STAMP_PREFIX_:-''}" ]] || setLogPrefixTo # let default flow run
-  echo "$STAMP_PREFIX_"
-}
+getLogPrefix() { echo "${STAMP_PREFIX_:-$__yblibLogDefaultPrefix}::"; }
 
 setMaxLogLevelToDebug() { LOG_MODE_=$LOG_LVL_DEBUG_; }
 logDebug() { logAs_ $LOG_LVL_DEBUG_ $@; }
