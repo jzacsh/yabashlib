@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+[[ -z "${_yblib_guard_files:-}" ]] || return 0; _yblib_guard_files=1 # include guard
 
 source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/behavior.sh"
 

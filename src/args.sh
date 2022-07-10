@@ -2,8 +2,8 @@
 #
 # Common CLI logic having to do with argument parsing, but less sophisticated
 # then getopts.
+[[ -z "${_yblib_guard_args:-}" ]] || return 0; _yblib_guard_args=1 # include guard
 
-# TODO if-def wrap the entirety of all yabashlib souceable scripts
 source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/string.sh"
 
 

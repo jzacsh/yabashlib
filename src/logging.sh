@@ -2,6 +2,7 @@
 #
 # Small set of generic Bash logging utilities that aim to stay project
 # agnostic.
+[[ -z "${_yblib_guard_logging:-}" ]] || return 0; _yblib_guard_logging=1 # include guard
 
 source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/console.sh"
 
