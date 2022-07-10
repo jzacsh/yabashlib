@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-
-# TODO if-def wrap the entirety of all yabashlib souceable scripts
+[[ -z "${_yblib_guard_behavior:-}" ]] || return 0; _yblib_guard_behavior=1 # include guard
 
 dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 source "$dir/logging.sh"

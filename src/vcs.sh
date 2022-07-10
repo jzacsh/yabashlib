@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 # Utilities helpful when dealing with version control systems (VCS).
+[[ -z "${_yblib_guard_vcs:-}" ]] || return 0; _yblib_guard_vcs=1 # include guard
 
 # TODO add test coverage
 function vcs_git_is_clean() (

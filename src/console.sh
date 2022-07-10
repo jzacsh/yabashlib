@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+[[ -z "${_yblib_guard_console:-}" ]] || return 0; _yblib_guard_console=1 # include guard
 
 function yblib.isStdoutTty() { [[ -t 1 ]]; }
 function yblib.isStdoutPiped() { ! yblib.isStdoutTty; }

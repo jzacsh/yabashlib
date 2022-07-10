@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+[[ -z "${_yblib_guard_string:-}" ]] || return 0; _yblib_guard_string=1 # include guard
 
 function strTrim() {
   local body="$1"
