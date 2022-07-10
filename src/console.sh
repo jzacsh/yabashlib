@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+function yblib.isStdoutTty() { [[ -t 1 ]]; }
+function yblib.isStdoutPiped() { ! yblib.isStdoutTty; }
+
 function term_is_tty_ssh() {
   [[ -n "${SSH_CLIENT:-}" ]] || [[ -n "${SSH_TTY:-}" ]] ||
     ( ps -o comm= -p "$PPID" | grep --quiet --extended-regexp '(sshd|*/sshd)'; )
@@ -12,6 +15,29 @@ function term_supports_color() {
   local tput_out; tput_out="$(tput colors 2>/dev/null)"
   (( $? == 0 )) && [[ "$tput_out" -gt 2 ]]
 }
+
+# see yblib.hasColor doc for more.
+function yblib.hasForcedColor() { [[ "${CLICOLOR_FORCE:-'0'}" != '0' ]]; }
+
+# Tries to guess whether color is allowed.
+#
+# This is tricky because there's no real standard, except two polar opposite
+# approaches that have gained steam:
+# - opt-in system: $CLICOLOR per https://bixense.com/clicolors
+# - opt-out system: $NO_COLOR https://no-color.org
+function yblib.hasColor() (
+  set +o nounset
+  local use_optout_def=1
+
+  if (( use_optout_def )); then
+    [[ -z "${NO_COLOR:-}" ]]
+    return $?
+  else
+    { [[ "$CLICOLOR" != '0' ]] && yblib.isStdoutTty; } ||
+      yblib.hasForcedColor
+    return $?
+  fi
+)
 
 # Base internal logic used by term_confirm.
 #
