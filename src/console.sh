@@ -45,11 +45,26 @@ function yblib.hasColor() (
 # succeed.
 # $2=prompt
 function __yabashlib__term_confirm() {
-  local answer
+  local prompt="$2"
+  local answer choice
+
+  local choice_colored
+  local color_on=1; yblib.hasColor || color_on=0
+  local col_end_='\033[0m'  # end cap
+  local col_prp_='\e[1;35m' col_red_='\e[1;31m'
+
+  echo -n "$prompt "
   if [[ "$1" = optout ]]; then
     # This case: special-casing is the requirement that a user opt-out if they
     # don't want to proceed in the positive, otherwise we will proceed.
-    read -p "$2 [Y/n] " answer
+    choice="[Y/n]"
+    if (( color_on )); then
+      choice_colored="${col_prp_}${choice}${col_end_}"
+      echo -en "${choice_colored} "
+    else
+      echo -en "$choice "
+    fi
+    read answer
 
     if strIsEmptyish "$answer"; then
       return 0 # proceed
@@ -58,7 +73,14 @@ function __yabashlib__term_confirm() {
     # This case: default is to require opt in if users want to proceed in the
     # positive, otherwise we'll not proceed.
 
-    read -p "$2 [y/N] " answer
+    choice="[y/N]"
+    if (( color_on )); then
+      choice_colored="${col_red_}${choice}${col_end_}"
+      echo -en " ${choice_colored} "
+    else
+      echo -en "$choice "
+    fi
+    read answer
     if strIsEmptyish "$answer"; then
       return 1 # do not proceed
     fi
