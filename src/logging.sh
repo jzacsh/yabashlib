@@ -12,6 +12,11 @@ setLogPrefixTo() {
   fi
 }
 
+getLogPrefix() {
+  [[ -e "${STAMP_PREFIX_:-''}" ]] || setLogPrefixTo # let default flow run
+  echo "$STAMP_PREFIX_"
+}
+
 setMaxLogLevelToDebug() { LOG_MODE_=$LOG_LVL_DEBUG_; }
 logDebug() { logAs_ $LOG_LVL_DEBUG_ $@; }
 logfDebug() { logfAs_ "$LOG_LVL_DEBUG_" "$@"; }
@@ -122,7 +127,7 @@ printLogHeader_() {
       keyword='ERROR';;
   esac
 
-  printStamp_ $color $fd "${STAMP_PREFIX_}${keyword}"
+  printStamp_ $color $fd "$(getLogPrefix)${keyword}"
   if (( log_lvl >= LOG_LVL_ERROR_ ));then
     echo -e "\t$(date --rfc-3339=seconds)" >&$fd
   fi
