@@ -25,19 +25,18 @@ function yblib.hasForcedColor() { [[ "${CLICOLOR_FORCE:-'0'}" != '0' ]]; }
 # approaches that have gained steam:
 # - opt-in system: $CLICOLOR per https://bixense.com/clicolors
 # - opt-out system: $NO_COLOR https://no-color.org
-function yblib.hasColor() (
-  set +o nounset
+function yblib.hasColor() {
   local use_optout_def=1
 
   if (( use_optout_def )); then
     [[ -z "${NO_COLOR:-}" ]]
     return $?
   else
-    { [[ "$CLICOLOR" != '0' ]] && yblib.isStdoutTty; } ||
+    { [[ "${CLICOLOR:-}" != '0' ]] && yblib.isStdoutTty; } ||
       yblib.hasForcedColor
     return $?
   fi
-)
+}
 
 # Base internal logic used by term_confirm.
 #
