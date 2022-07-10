@@ -58,7 +58,7 @@ function __yabashlib__term_confirm() {
     # don't want to proceed in the positive, otherwise we will proceed.
     choice="[Y/n]"
     if (( color_on )); then
-      choice_colored="${col_prp_}${choice}${col_end_}"
+      choice_colored="${col_red_}${choice}${col_end_}"
       echo -en "${choice_colored} "
     else
       echo -en "$choice "
@@ -74,7 +74,7 @@ function __yabashlib__term_confirm() {
 
     choice="[y/N]"
     if (( color_on )); then
-      choice_colored="${col_red_}${choice}${col_end_}"
+      choice_colored="${col_prp_}${choice}${col_end_}"
       echo -en " ${choice_colored} "
     else
       echo -en "$choice "
