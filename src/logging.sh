@@ -3,6 +3,8 @@
 # Small set of generic Bash logging utilities that aim to stay project
 # agnostic.
 
+source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/console.sh"
+
 # $1 = optionally set 'your_prefix'
 setLogPrefixTo() {
   if (( $# == 1 )); then
