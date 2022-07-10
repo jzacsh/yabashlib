@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+function yblib.isStdoutTty() { [[ -t 1 ]]; }
+function yblib.isStdoutPiped() { ! yblib.isStdoutTty; }
+
 function term_is_tty_ssh() {
   [[ -n "${SSH_CLIENT:-}" ]] || [[ -n "${SSH_TTY:-}" ]] ||
     ( ps -o comm= -p "$PPID" | grep --quiet --extended-regexp '(sshd|*/sshd)'; )
@@ -13,17 +16,54 @@ function term_supports_color() {
   (( $? == 0 )) && [[ "$tput_out" -gt 2 ]]
 }
 
+# see yblib.hasColor doc for more.
+function yblib.hasForcedColor() { [[ "${CLICOLOR_FORCE:-'0'}" != '0' ]]; }
+
+# Tries to guess whether color is allowed.
+#
+# This is tricky because there's no real standard, except two polar opposite
+# approaches that have gained steam:
+# - opt-in system: $CLICOLOR per https://bixense.com/clicolors
+# - opt-out system: $NO_COLOR https://no-color.org
+function yblib.hasColor() {
+  local use_optout_def=1
+
+  if (( use_optout_def )); then
+    [[ -z "${NO_COLOR:-}" ]]
+    return $?
+  else
+    { [[ "${CLICOLOR:-}" != '0' ]] && yblib.isStdoutTty; } ||
+      yblib.hasForcedColor
+    return $?
+  fi
+}
+
 # Base internal logic used by term_confirm.
 #
 # $1=requires 'optin' or 'optout' to indicate what is required for prompt to
 # succeed.
 # $2=prompt
 function __yabashlib__term_confirm() {
-  local answer
+  local prompt="$2"
+  local answer choice
+
+  local choice_colored
+  local color_on=1; yblib.hasColor || color_on=0
+  local col_end_='\033[0m'  # end cap
+  local col_prp_='\e[1;35m' col_red_='\e[1;31m'
+
+  echo -n "$prompt "
   if [[ "$1" = optout ]]; then
     # This case: special-casing is the requirement that a user opt-out if they
     # don't want to proceed in the positive, otherwise we will proceed.
-    read -p "$2 [Y/n] " answer
+    choice="[Y/n]"
+    if (( color_on )); then
+      choice_colored="${col_prp_}${choice}${col_end_}"
+      echo -en "${choice_colored} "
+    else
+      echo -en "$choice "
+    fi
+    read answer
 
     if strIsEmptyish "$answer"; then
       return 0 # proceed
@@ -32,7 +72,14 @@ function __yabashlib__term_confirm() {
     # This case: default is to require opt in if users want to proceed in the
     # positive, otherwise we'll not proceed.
 
-    read -p "$2 [y/N] " answer
+    choice="[y/N]"
+    if (( color_on )); then
+      choice_colored="${col_red_}${choice}${col_end_}"
+      echo -en " ${choice_colored} "
+    else
+      echo -en "$choice "
+    fi
+    read answer
     if strIsEmptyish "$answer"; then
       return 1 # do not proceed
     fi

@@ -41,15 +41,6 @@ enableLogHeaders() { LOG_HEADERS_=1; }
 
 # end public API #####################################
 
-
-col_end_='\033[0m'  # end cap
-col_blk_='\e[0;30m'
-col_red_='\e[1;31m'
-col_grn_='\e[1;32m'
-col_ylw_='\e[1;33m'
-col_blu_='\e[1;34m'
-col_wht_='\e[0;37m'
-
 LOG_LVL_DEBUG_=1
 LOG_LVL_INFO_=2
 LOG_LVL_WARNING_=3
@@ -110,6 +101,9 @@ printLogHeader_() {
   log_lvl="$1"
   fd="$2"
 
+  local col_red_='\e[1;31m' col_grn_='\e[1;32m'
+  local col_ylw_='\e[1;33m' col_blu_='\e[1;34m'
+
   (( LOG_HEADERS_ )) || return 0
 
   case "$log_lvl" in
@@ -139,10 +133,11 @@ printLogHeader_() {
 # .. = text to highlight
 printStamp_() {
   local color fd
+  local col_end_='\033[0m'  # end cap
   color=$1; fd=$2;
   shift; shift;
 
-  if [[ -t $fd ]];then
+  if yblib.hasColor && [[ -t $fd ]];then
     echo -ne "${color}[$@]${col_end_}\t" >&$fd
   else
     echo -ne "[$@]\t" >&$fd
