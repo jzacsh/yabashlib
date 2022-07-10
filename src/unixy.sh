@@ -67,10 +67,14 @@ function yblib.guessGnuLinuxDistroBase() {
 
   local like
   like="$(__yblib.releaseFileValue ID_LIKE < "$osReleaseFile")" || return 1
-  { strIsContentful "$like" && [[ "$distro" != "$like" ]]; } || return 1
+  if strIsContentful "$like"; then
+    [[ "$distro" != "$like" ]] || return 1 # seems like an invalid os-release file
 
-  # take only the first value in a space-separated list of values.
-  echo "${like%% *}"
+    # take only the first value in a space-separated list of values.
+    echo "${like%% *}"
+  else
+    echo "$distro" # effectively falls back on ID= value
+  fi
 }
 
 function yblib.guessGnuLinuxDistro() {
