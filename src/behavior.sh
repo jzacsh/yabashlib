@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
+if type yblib.behaviorReload >/dev/null 2>&1; then yblib.behaviorReload; fi
+# state that needs reset for every caller (who will source us) should be above
+# this guard.
 [[ -z "${_yblib_guard_behavior:-}" ]] || return 0; _yblib_guard_behavior=1 # include guard
 
-dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-source "$dir/logging.sh"
+source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/logging.sh"
+# all state restting should happen here, including reload of things we include
+# above
+function yblib.behaviorReload() {
+  yblib.loggingReload
+}
 
 #see /usr/include/sysexits.h
 BEHAVIOR_EXIT_ERROR=1   #general error

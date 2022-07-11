@@ -2,20 +2,39 @@
 #
 # Small set of generic Bash logging utilities that aim to stay project
 # agnostic.
+
+if type yblib.loggingReload >/dev/null 2>&1; then yblib.loggingReload; fi
+# state that needs reset for every caller (who will source us) should be above
+# this guard.
 [[ -z "${_yblib_guard_logging:-}" ]] || return 0; _yblib_guard_logging=1 # include guard
 
 source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/console.sh"
-
-declare -r __yblibLogDefaultPrefix=yblib
+# all state restting should happen here, including reload of things we include
+# above
+# TODO add this pattern to _every_ yblib file and call the includes' reloads
+# appropriately.
+function yblib.loggingReload() {
+  setLogPrefixTo
+  # TODO call yblib.consoleReload
+}
 
 # $1 = optionally set 'your_prefix'
 setLogPrefixTo() {
-  (( $# == 1 )) || return 1
-
-  STAMP_PREFIX_="$1"
+  if (( $# == 1 )); then
+    STAMP_PREFIX_="$1"
+  else
+    unset STAMP_PREFIX_
+  fi
 }
 
-getLogPrefix() { echo "${STAMP_PREFIX_:-$__yblibLogDefaultPrefix}::"; }
+getLogPrefix() {
+  local prefix; prefix="${STAMP_PREFIX_:-}"
+  if [[ -z "$prefix" ]]; then
+    echo yblib
+  else
+    echo "$prefix"
+  fi
+}
 
 setMaxLogLevelToDebug() { LOG_MODE_=$LOG_LVL_DEBUG_; }
 logDebug() { logAs_ $LOG_LVL_DEBUG_ $@; }
@@ -121,7 +140,7 @@ printLogHeader_() {
       keyword='ERROR';;
   esac
 
-  printStamp_ $color $fd "$(getLogPrefix)${keyword}"
+  printStamp_ $color $fd "$(getLogPrefix)::${keyword}"
   if (( log_lvl >= LOG_LVL_ERROR_ ));then
     echo -e "\t$(date --rfc-3339=seconds)" >&$fd
   fi

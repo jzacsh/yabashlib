@@ -5,9 +5,13 @@ load mocks
 
 setup() {
   source "$SRCS/logging.sh"
-  setLogPrefixTo 'logtests'
-
   MOCK_DATE="$(date)"
+
+  # Ensure we can get simple $lines comparisons
+  export NO_COLOR=1
+  # TODO figure out how to write legible BATS tests against $lines array that
+  # allow for color evaluation, then add some lightweight test coverage of color
+  # enablement.
 }
 
 teardown() {
@@ -16,6 +20,7 @@ teardown() {
 
 
 @test 'should include timestamp in ERROR level' {
+  setLogPrefixTo 'logtests'
   run logError "testing123"
   [ "$status" -eq 0 ]
   [[ "${lines[0]}" =~ ^\[logtests::ERROR\][[:space:]]*$MOCK_DATE$ ]]
@@ -24,6 +29,7 @@ teardown() {
 
 
 @test 'should default to INFO level logging' {
+  setLogPrefixTo 'logtests'
   run logInfo "foobar"
   [ "$status" -eq 0 ]
   [[ "${lines[0]}" =~ ^\[logtests::INFO\][[:space:]]*foobar$ ]]
@@ -42,7 +48,7 @@ teardown() {
 
 
 @test 'should set default log prefix' {
-  setLogPrefixTo
+  source "$SRCS/logging.sh" # API for getting fresh log prefix
   testMsg='testing234'
   testPref='hippo'
 
@@ -50,24 +56,25 @@ teardown() {
 
   run logDebug "$testMsg"
   [ "$status" -eq 0 ]
-  [[ "${lines[0]}" =~ ^\[logging::DEBUGGING\][[:space:]]*$testMsg$ ]]
+  [[ "${lines[0]}" =~ ^\[yblib::DEBUGGING\][[:space:]]*$testMsg$ ]]
 
   run logInfo "$testMsg"
   [ "$status" -eq 0 ]
-  [[ "${lines[0]}" =~ ^\[logging::INFO\][[:space:]]*$testMsg$ ]]
+  [[ "${lines[0]}" =~ ^\[yblib::INFO\][[:space:]]*$testMsg$ ]]
 
   run logWarning "$testMsg"
   [ "$status" -eq 0 ]
-  [[ "${lines[0]}" =~ ^\[logging::WARNING\][[:space:]]*$testMsg$ ]]
+  [[ "${lines[0]}" =~ ^\[yblib::WARNING\][[:space:]]*$testMsg$ ]]
 
   run logError "$testMsg"
   [ "$status" -eq 0 ]
-  [[ "${lines[0]}" =~ ^\[logging::ERROR\][[:space:]]*$MOCK_DATE$ ]]
+  [[ "${lines[0]}" =~ ^\[yblib::ERROR\][[:space:]]*$MOCK_DATE$ ]]
   [[ "${lines[1]}" =~ ^$testMsg$ ]]
 }
 
 
 @test 'should insert app name in prefix' {
+  setLogPrefixTo 'logtests'
   testMsg='testing234'
 
   testPref='hippo'
@@ -85,6 +92,7 @@ teardown() {
 
 
 @test 'should silence lower log levels' {
+  setLogPrefixTo 'logtests'
   setMaxLogLevelToInfo
   run logDebug "foo"
   [ "$status" -eq 0 ]
@@ -108,6 +116,7 @@ teardown() {
 
 
 @test 'should allow disabling log headers at all levels ' {
+  setLogPrefixTo 'logtests'
   setMaxLogLevelToDebug
 
   disableLogHeaders
@@ -155,6 +164,7 @@ teardown() {
 
 
 @test 'should error-exit via logfFatal' {
+  setLogPrefixTo 'logtests'
   run logfFatal 'my %s log\n' printf-fatal
   [ "$status" -ne 0 ]
   [ "${#lines[@]}" -eq 2 ]
