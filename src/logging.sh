@@ -156,7 +156,7 @@ printStamp_() {
   color=$1; fd=$2;
   shift; shift;
 
-  if yblib.hasColor && [[ -t $fd ]];then
+  if yblib.hasColor $fd;then
     echo -ne "${color}[$@]${col_end_}\t" >&$fd
   else
     echo -ne "[$@]\t" >&$fd

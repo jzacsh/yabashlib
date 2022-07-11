@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 [[ -z "${_yblib_guard_console:-}" ]] || return 0; _yblib_guard_console=1 # include guard
 
+function yblib.isTty() { [[ -t "$1" ]]; }
 function yblib.isStdoutTty() { [[ -t 1 ]]; }
 function yblib.isStdoutPiped() { ! yblib.isStdoutTty; }
 
@@ -22,18 +23,22 @@ function yblib.hasForcedColor() { [[ "${CLICOLOR_FORCE:-'0'}" != '0' ]]; }
 
 # Tries to guess whether color is allowed.
 #
+# $1=optional file descriptor (integer) you're asking about having color for (we
+# assume you're considering outputting color to stdout - fd 1 - by default).
+#
 # This is tricky because there's no real standard, except two polar opposite
 # approaches that have gained steam:
 # - opt-in system: $CLICOLOR per https://bixense.com/clicolors
 # - opt-out system: $NO_COLOR https://no-color.org
 function yblib.hasColor() {
+  local fd="${1:-1}"
   local use_optout_def=1
 
   if (( use_optout_def )); then
     [[ -z "${NO_COLOR:-}" ]]
     return $?
   else
-    { [[ "${CLICOLOR:-}" != '0' ]] && yblib.isStdoutTty; } ||
+    { [[ "${CLICOLOR:-}" != '0' ]] && yblib.isTty "$fd"; } ||
       yblib.hasForcedColor
     return $?
   fi
