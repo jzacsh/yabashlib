@@ -10,6 +10,12 @@ function term_is_tty_ssh() {
     ( ps -o comm= -p "$PPID" | grep --quiet --extended-regexp '(sshd|*/sshd)'; )
 }
 
+# Whether it's appropriate to try to use colors.
+#
+# $1=optional file descriptor (integer) you're asking about having color for (we
+# assume you're considering outputting color to stdout - fd 1 - by default).
+function yblib.hasColor() { term_supports_color && yblib.userSupportsColor "$@"; }
+
 function term_supports_color() {
   # 'colors' is the "capname" (see tput(1)) that outputs a numeric value from
   # the terminfo(5) database. See "numeric capabilities" listing of the terminfo
@@ -18,7 +24,7 @@ function term_supports_color() {
   (( $? == 0 )) && [[ "$tput_out" -gt 2 ]]
 }
 
-# see yblib.hasColor doc for more.
+# see yblib.userSupportsColor doc for more.
 function yblib.hasForcedColor() { [[ "${CLICOLOR_FORCE:-'0'}" != '0' ]]; }
 
 # Tries to guess whether color is allowed.
@@ -30,7 +36,7 @@ function yblib.hasForcedColor() { [[ "${CLICOLOR_FORCE:-'0'}" != '0' ]]; }
 # approaches that have gained steam:
 # - opt-in system: $CLICOLOR per https://bixense.com/clicolors
 # - opt-out system: $NO_COLOR https://no-color.org
-function yblib.hasColor() {
+function yblib.userSupportsColor() {
   local fd="${1:-1}"
   local use_optout_def=1
 
