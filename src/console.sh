@@ -144,3 +144,13 @@ function yblib.cloneCompletion() {
 #   - 2) gradle[TAB]         # magically working
 #   - 3) complete -p gradle  # outputs gradle-completion binding
 function yblib.haveCompletion() { complete -p "$1" >/dev/null 2>&1; }
+
+# Prints characters all the way across the terminal, from left to right.
+#
+# $1=opt_char horizontal rule character to override the default
+function yblib.consolePrintHr() {
+  local rule_char="${1:-'='}"
+  local col_count; col_count="$(tput cols)"
+  printf -- '%0.s'"$rule_char" $(seq 1 $col_count)
+  printf -- '\n'
+}
