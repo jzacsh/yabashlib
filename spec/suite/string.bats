@@ -131,3 +131,33 @@ setup() {
   [ "$status" -eq 0 ]
   [ "$output" = 'foofoofoofoofoofoofoofoo' ]
 }
+
+@test 'strJoin concats strings together with a given delim' {
+  run yblib.strJoin . foo bar baz
+  [ "$status" -eq 0 ]
+  [ "$output" = 'foo.bar.baz' ]
+
+  run yblib.strJoin '|' foo bar
+  [ "$status" -eq 0 ]
+  [ "$output" = 'foo|bar' ]
+
+  run yblib.strJoin ':' foo bar baz thing
+  [ "$status" -eq 0 ]
+  [ "$output" = 'foo:bar:baz:thing' ]
+
+  run yblib.strJoin ' ' some spaces here
+  [ "$status" -eq 0 ]
+  [ "$output" = 'some spaces here' ]
+}
+
+@test 'strJoin does not break with edge cases' {
+  # edge case: single-item list
+  run yblib.strJoin '|' foo
+  [ "$status" -eq 0 ]
+  [ "$output" = 'foo' ]
+
+  # edge case: zero-item list
+  run yblib.strJoin '|'
+  [ "$status" -eq 0 ]
+  [ "$output" = '' ]
+}

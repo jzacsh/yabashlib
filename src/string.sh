@@ -92,3 +92,21 @@ function strRepeatN() {
   printf -- '%s\n' \
     "${template//-/$content}"
 }
+
+# Joins all arguments (after the first) with the delimeter passed as the first
+# argument.
+#
+# $1=delimeter to join with
+# ...=remaining args to join
+function yblib.strJoin() {
+  local str delim="$1"; shift
+
+  # concat args together with a delimeter
+  printf -v str -- '%s'"$delim" "$@"
+
+  # strip the trailing delimeter
+  # eg: a|b|c| --> a|b|c
+  str="${str%$delim}"
+
+  printf -- '%s' "$str"
+}
