@@ -34,6 +34,25 @@ function __yblib.vcsis_in_git(){
   ( cd "$1"; git rev-parse --show-toplevel >/dev/null 2>&1; )
 }
 
+# Whether PWD (or $1 if provided) is a VCS repo.
+function yblib.isVcsRepo() {
+  ret=1
+  if [[ "$#" -gt 0 ]]; then
+    pushd "$1" >/dev/null || return 1
+  fi
+
+  if __yblib.vcsis_in_git; then
+    ret=0
+  elif __yblib.vcsIs_in_hg; then
+    ret=0
+  fi
+
+  if [[ "$#" -gt 0 ]]; then
+    popd >/dev/null
+  fi
+  return $ret
+}
+
 # Prints and `cd`s into root dir.
 function yblib.vcsRoot() {
   local root_dir="$(
