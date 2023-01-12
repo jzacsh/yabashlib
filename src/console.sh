@@ -7,7 +7,7 @@ function yblib.isStdoutPiped() { ! yblib.isStdoutTty; }
 
 function term_is_tty_ssh() {
   [[ -n "${SSH_CLIENT:-}" ]] || [[ -n "${SSH_TTY:-}" ]] ||
-    ( ps -o comm= -p "$PPID" | grep --quiet --extended-regexp '(sshd|*/sshd)'; )
+    ( ps -o comm= -p "$PPID" | grep --quiet --extended-regexp '(sshd|.*/sshd)'; )
 }
 
 # Whether it's appropriate to try to use colors.
