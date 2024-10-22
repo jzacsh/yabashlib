@@ -14,7 +14,11 @@ function term_is_tty_ssh() {
 #
 # $1=optional file descriptor (integer) you're asking about having color for (we
 # assume you're considering outputting color to stdout - fd 1 - by default).
-function yblib.hasColor() { term_supports_color && yblib.userSupportsColor "$@"; }
+function yblib.hasColor() {
+  term_supports_color &&
+    yblib.isStdoutTty &&
+    yblib.userSupportsColor "$@"
+}
 
 function term_supports_color() {
   # 'colors' is the "capname" (see tput(1)) that outputs a numeric value from
