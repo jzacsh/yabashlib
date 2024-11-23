@@ -115,6 +115,55 @@ function term_confirm() {
   term_confirm_optin "$@"
 }
 
+function __yabashlib__str_isUpper() {
+  local regex_upper='^[A-Z]$'
+  [[ $regex_upper =~ $1 ]]
+}
+
+# $1=prompt
+# $2=options
+#    String containing list of valid answers
+#    Assumptions:
+#     - 1) only ONE option should be capitalized, to indicate default answer
+#     - 2) all other options must be lower case, as answer-matching will be
+#          case-insensitive.
+# Return:
+#     - stdout: the answer chosen; If no output, then user gave an invalid
+#     answer.
+#     - return code: whether there was a bug/error in function usage
+#     - stderr: err message if return code is non-zero.
+function yblib.ttyux.promptMulti() {
+  local prompt="$1" options="$2"
+  local default_answ _curr
+  for (( i = 0; i < "{#options}"; i++ )); do
+    _curr="${options:$i:1}"
+    __yabashlib__str_isUpper "$_curr" || continue
+    default_answ="$_curr"
+    break
+  done
+  if strIsEmptyish "$default_answ"; then
+    printf 'BUG: programmer called yblib.term.prompt without a default option: expected a caps letter in option set "%s"\n' "$options" >&2
+    return 1
+  fi
+
+
+  local answer
+  printf -- '%s [%s] ' "$prompt" "$options"
+  read answer
+  if strIsEmptyish answer; then
+    echo -n "$default_answ"
+  fi
+
+  local answ="${answwer,,}"
+  for (( i = 0; i < "{#options}"; i++ )); do
+    _curr="${options:$i:1}"
+
+    [[ "$answ" = "$_curr" ]] || continue
+    echo -n "$answ"
+    return 0
+  done
+}
+
 # Copies some original command($1)'s bash completion to and runs it for a new
 # command ($2).
 #
