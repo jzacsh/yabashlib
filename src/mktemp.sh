@@ -14,63 +14,51 @@ function __yblib.mkHumanTempTemplatePrefix() {
 }
 
 # $1=brief human-written slug to conceptually remind what this temp was about.
+# $2=non-portable suffix
 function __yblib.mkHumanTempTemplate() {
-  local slug="$1" sortablePrefix
+  local slug="$1" nonPortableSuffix="${2:-''}" sortablePrefix
 
   sortablePrefix="$(__yblib.mkHumanTempTemplatePrefix)" || return 1
   printf -- \
-    '%s_%s_XXXXXXXX' \
+    '%s_%s_XXXXXXXX%s' \
     "$sortablePrefix" \
-    "$slug"
+    "$slug" \
+    "$nonPortableSuffix"
 }
 
 # `mktemp` with a default template that's human-readable, sortable, and whose
 # age is immediately obvious at a glance.
 #
 # $1=brief human-written slug to conceptually remind what this temp was about.
+# $2=optional non-portable suffix to tack on the end (like ".jpg").
 #
 # internal details: see __yblib.mkHumanTempTemplate
 function yblib.mkHumanTemp() {
-  local slug="$1" templ
-  [[ "$#" -eq 1 ]] || {
-    logfError 'usage: require SLUG as only arg\n'
+  local templ
+  [[ "$#" -ge 0 && "$#" -le 2 ]] || {
+    logfError 'usage: SLUG [NON_PORTABLE_SUFFIX]\n'
     return 1
   }
 
-  templ="$(__yblib.mkHumanTempTemplate "$slug")" || return 1
+  templ="$(__yblib.mkHumanTempTemplate "$@")" || return 1
   mktemp --tmpdir=  "$templ"
 }
 
 # like yblib.mkHumanTemp but in $PWD
 #
 # $1=brief human-written slug to conceptually remind what this temp was about.
+# $2=optional non-portable suffix to tack on the end (like ".jpg").
 function yblib.mkHumanLocalTemp() { TMPDIR=. yblib.mkHumanTemp "$@"; }
 
 # $1=brief human-written slug to conceptually remind what this temp was about.
-function __yblib.mkHumanTempTemplateDir() {
-  local slug="$1" sortablePrefix
-
-  sortablePrefix="$(__yblib.mkHumanTempTemplatePrefix)" || return 1
-  printf -- \
-    '%s_%s_XXXXXXXX.d' \
-    "$sortablePrefix" \
-    "$slug"
-}
+function __yblib.mkHumanTempTemplateDir() { __yblib.mkHumanTempTemplate "$1" .d; }
 
 # Annoying version of __yblib.mkHumanTempTemplateDir just for OSX (and maybe
 # BSD?) users whose `mktemp` _requires_ XXXXXXX to be the last chunk of a
 # template.
 #
 # $1=brief human-written slug to conceptually remind what this temp was about.
-function __yblib.mkHumanTempTemplateDirPortable() {
-  local slug="$1" sortablePrefix
-
-  sortablePrefix="$(__yblib.mkHumanTempTemplatePrefix)" || return 1
-  printf -- \
-    '%s_%s_d-XXXXXXXX' \
-    "$sortablePrefix" \
-    "$slug"
-}
+function __yblib.mkHumanTempTemplateDirPortable() { __yblib.mkHumanTempTemplate "$1"; }
 
 # `mktemp -d` with a default template that's human-readable, sortable, and whose
 # age is immediately obvious at a glance.
