@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck source=/dev/null
 if type yblib.behaviorReload >/dev/null 2>&1; then yblib.behaviorReload; fi
 # state that needs reset for every caller (who will source us) should be above
 # this guard.
@@ -46,10 +47,12 @@ die() {
 }
 
 dieWithoutBash4() {
-  (( BASH_VERSINFO[0] >= 4 )) && return 0
+  local actualMajorVer="${BASH_VERSINFO[0]}" # first char of string
+  (( 10#actualMajorVer < 4 )) || return 0
 
-  local msg="Bash v.4 or greater is required to run this script, found %s\n"
-  printf "$msg" "$BASH_VERSINFO[0]"
+  printf -- \
+    'Bash v.4 or greater is required to run this script, found %s\n' \
+    "$actualMajorVer"
   exit "$BEHAVIOR_EXIT_ERROR"
 }
 

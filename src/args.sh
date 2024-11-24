@@ -2,6 +2,7 @@
 #
 # Common CLI logic having to do with argument parsing, but less sophisticated
 # then getopts.
+# shellcheck source=/dev/null
 [[ -z "${_yblib_guard_args:-}" ]] || return 0; _yblib_guard_args=1 # include guard
 
 source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/string.sh"
