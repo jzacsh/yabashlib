@@ -16,7 +16,7 @@ function __yblib.mkHumanTempTemplatePrefix() {
 # $1=brief human-written slug to conceptually remind what this temp was about.
 # $2=non-portable suffix
 function __yblib.mkHumanTempTemplate() {
-  local slug="$1" nonPortableSuffix="${2:-''}" sortablePrefix
+  local slug="$1" nonPortableSuffix="${2:-}" sortablePrefix
 
   sortablePrefix="$(__yblib.mkHumanTempTemplatePrefix)" || return 1
   printf -- \
