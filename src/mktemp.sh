@@ -35,7 +35,7 @@ function __yblib.mkHumanTempTemplate() {
 # internal details: see __yblib.mkHumanTempTemplate
 function yblib.mkHumanTemp() {
   local templ
-  [[ "$#" -ge 0 && "$#" -le 2 ]] || {
+  [[ "$#" -ge 1 && "$#" -le 2 ]] || {
     logfError 'usage: SLUG [NON_PORTABLE_SUFFIX]\n'
     return 1
   }
