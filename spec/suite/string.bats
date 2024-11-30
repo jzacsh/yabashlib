@@ -71,6 +71,11 @@ setup() {
   [ "$status" -eq 0 ]
 }
 
+@test 'strStartsWith handles too-small haystack' {
+  run strStartsWith '$f' '$foo'
+  [ "$status" -eq 1 ]
+}
+
 @test 'strContains detects haystack is a superset of needle' {
   run strContains 'foobar' 'oba'
   [ "$status" -eq 0 ]

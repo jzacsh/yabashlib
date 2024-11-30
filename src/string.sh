@@ -52,6 +52,7 @@ function strIsEmptyish() {
 function strStartsWith() {
   local haystack="$1" needle="$2"
   local needle_length="${#needle}"
+  [[ "$needle_length" -le "${#haystack}" ]] || return 1
   local haystack_subset="${haystack:0:$needle_length}"
   [[ "$haystack_subset" = "$needle" ]]
 }
