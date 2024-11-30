@@ -57,6 +57,18 @@ function strStartsWith() {
   [[ "$haystack_subset" = "$needle" ]]
 }
 
+# Whether string "$1" (haystack) ends with string "$2" (needle).
+function strEndsWith() {
+  local haystack="$1" needle="$2"
+  local needle_len="${#needle}"
+  local haystack_len="${#haystack}"
+  [[ "$needle_len" -le "$haystack_len" ]] || return 1
+
+  local offset="$(( 10#$haystack_len - 10#$needle_len ))"
+  local haystack_subset="${haystack:$offset}"
+  [[ "$haystack_subset" = "$needle" ]]
+}
+
 # Whether string "$1" (haystack) contains string "$2" (needle).
 function strContains() {
   local haystack="$1" needle="$2"

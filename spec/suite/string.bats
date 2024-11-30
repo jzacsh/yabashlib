@@ -76,6 +76,28 @@ setup() {
   [ "$status" -eq 1 ]
 }
 
+@test 'strEndsWith detects one is a non-strict subset and prefix of another' {
+  run strEndsWith 'foobar' 'bar'
+  [ "$status" -eq 0 ]
+  run strEndsWith 'foobar ' ' '
+  [ "$status" -eq 0 ]
+}
+
+@test 'strEndsWith detects negative cases' {
+  run strEndsWith 'foobar$' 'bar'
+  [ "$status" -ne 0 ]
+}
+
+@test 'strEndsWith is robust against chars that would look like regexp syntax' {
+  run strEndsWith 'foobar$' '$'
+  [ "$status" -eq 0 ]
+}
+
+@test 'strEndsWith handles too-small haystack' {
+  run strEndsWith '$' '$foo'
+  [ "$status" -eq 1 ]
+}
+
 @test 'strContains detects haystack is a superset of needle' {
   run strContains 'foobar' 'oba'
   [ "$status" -eq 0 ]
