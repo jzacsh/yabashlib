@@ -3,6 +3,10 @@
 # Utilities helpful when dealing with version control systems (VCS).
 [[ -z "${_yblib_guard_vcs:-}" ]] || return 0; _yblib_guard_vcs=1 # include guard
 
+# TODO migrate dotfiles' drifting vcs lib to live here, and make that lib a
+# simple proxying layer to this codebase. See 9fa1e7a5e in
+# https://gitlab.com/jzacsh/dotflies.
+
 # TODO add test coverage
 function vcs_git_is_clean() (
   [[ "$#" -eq 0 ]] || {
