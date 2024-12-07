@@ -154,7 +154,9 @@ function yblib.haveCompletion() { complete -p "$1" >/dev/null 2>&1; }
 # $1=opt_char horizontal rule character to override the default
 function yblib.consolePrintHr() {
   local rule_char="${1:-'='}"
-  local col_count; col_count="$(tput cols)"
-  printf -- '%0.s'"$rule_char" $(seq 1 $col_count)
+  local col_count; col_count="$(tput cols)" || col_count=40
+  local fmt='%0.s'"$rule_char"
+  # shellcheck disable=SC2059
+  printf -- "$fmt" "$(seq 1 "$col_count")"
   printf -- '\n'
 }
