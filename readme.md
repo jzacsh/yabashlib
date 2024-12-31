@@ -84,5 +84,5 @@ If you're testing that issue you can do so easily by:
    (without properly refreshing the vendored copy, as one should when not
    testing, via `vendor/update.sh`).
 
-[gitlab_ci_badge]: https://gitlab.com/jzacsh/yabashlib/badges/master/pipeline.svg
+[gitlab_ci_badge]: https://gitlab.com/jzacsh/yabashlib/badges/main/pipeline.svg
 [gitlab_ci_dash]: https://gitlab.com/jzacsh/yabashlib/-/jobs
